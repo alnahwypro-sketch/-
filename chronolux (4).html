@@ -1,0 +1,2944 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CHRONOLUX</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #040711;
+      --bg-card: rgba(10, 15, 28, 0.46);
+      --accent-main: #10b981;
+      --accent-glow: rgba(16, 185, 129, 0.32);
+      --accent-sec: #6ee7b7;
+      --accent-rgb: 16, 185, 129;
+      --accent-2-rgb: 6, 182, 212;
+      --accent-3-rgb: 212, 175, 55;
+      --border-lux: rgba(16, 185, 129, 0.24);
+    }
+
+    [data-theme="gold"] {
+      --bg-primary: #080604;
+      --bg-card: rgba(18, 14, 10, 0.48);
+      --accent-main: #d4af37;
+      --accent-glow: rgba(212, 175, 55, 0.32);
+      --accent-sec: #f3e5ab;
+      --accent-rgb: 212, 175, 55;
+      --accent-2-rgb: 245, 158, 11;
+      --accent-3-rgb: 16, 185, 129;
+      --border-lux: rgba(212, 175, 55, 0.24);
+    }
+
+    [data-theme="emerald"] {
+      --bg-primary: #030908;
+      --bg-card: rgba(8, 20, 18, 0.46);
+      --accent-main: #10b981;
+      --accent-glow: rgba(16, 185, 129, 0.32);
+      --accent-sec: #6ee7b7;
+      --accent-rgb: 16, 185, 129;
+      --accent-2-rgb: 56, 189, 248;
+      --accent-3-rgb: 168, 85, 247;
+      --border-lux: rgba(16, 185, 129, 0.24);
+    }
+
+    [data-theme="sapphire"] {
+      --bg-primary: #030612;
+      --bg-card: rgba(9, 16, 34, 0.46);
+      --accent-main: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.32);
+      --accent-sec: #bae6fd;
+      --accent-rgb: 56, 189, 248;
+      --accent-2-rgb: 129, 140, 248;
+      --accent-3-rgb: 16, 185, 129;
+      --border-lux: rgba(56, 189, 248, 0.24);
+    }
+
+    [data-theme="crimson"] {
+      --bg-primary: #0a0407;
+      --bg-card: rgba(24, 10, 16, 0.46);
+      --accent-main: #fb7185;
+      --accent-glow: rgba(251, 113, 133, 0.32);
+      --accent-sec: #fecdd3;
+      --accent-rgb: 251, 113, 133;
+      --accent-2-rgb: 244, 63, 94;
+      --accent-3-rgb: 212, 175, 55;
+      --border-lux: rgba(251, 113, 133, 0.24);
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Alexandria', sans-serif;
+      font-weight: 400;
+      background-color: var(--bg-primary);
+      color: #f8fafc;
+      min-height: 100vh;
+      width: 100vw;
+      overflow-x: hidden;
+      letter-spacing: -0.01em;
+    }
+
+    #bgAnimatedCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .mono-digits {
+      font-family: 'Outfit', sans-serif;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.02em;
+    }
+
+    .lux-card {
+      background: linear-gradient(145deg, rgba(6, 10, 22, 0.78) 0%, rgba(4, 7, 16, 0.86) 100%);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border: 1px solid rgba(var(--accent-rgb), 0.30);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.10);
+    }
+
+    .lux-border-glow {
+      background: linear-gradient(145deg, rgba(6, 10, 22, 0.80) 0%, rgba(4, 7, 16, 0.88) 100%);
+      backdrop-filter: blur(22px) saturate(165%);
+      -webkit-backdrop-filter: blur(22px) saturate(165%);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65), 0 0 32px rgba(var(--accent-rgb), 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
+
+    svg {
+      filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.65));
+    }
+
+    .lux-btn-primary {
+      background: linear-gradient(135deg, var(--accent-sec) 0%, var(--accent-main) 100%);
+      color: #04070e;
+      font-weight: 600;
+      box-shadow: 0 8px 26px var(--accent-glow);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .lux-btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 32px var(--accent-glow);
+      filter: brightness(1.06);
+    }
+
+    .lux-btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .lux-chip {
+      background: rgba(9, 14, 26, 0.82);
+      backdrop-filter: blur(16px) saturate(150%);
+      -webkit-backdrop-filter: blur(16px) saturate(150%);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .glass-mini {
+      background: rgba(8, 12, 24, 0.84);
+      backdrop-filter: blur(16px) saturate(150%);
+      -webkit-backdrop-filter: blur(16px) saturate(150%);
+      border: 1px solid rgba(255, 255, 255, 0.20);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+    }
+
+    .lux-chip:hover {
+      background: rgba(var(--accent-rgb), 0.15);
+      border-color: rgba(var(--accent-rgb), 0.5);
+      transform: translateY(-1px);
+    }
+
+    .accent-text {
+      color: var(--accent-sec);
+    }
+
+    .accent-bg {
+      background-color: var(--accent-main);
+    }
+
+    .ring-progress {
+      transition: stroke-dashoffset 0.22s linear;
+      filter: drop-shadow(0 0 14px var(--accent-glow));
+    }
+
+    @keyframes pulse-ring {
+      0%, 100% { transform: scale(1); opacity: 0.94; }
+      50% { transform: scale(1.03); opacity: 1; }
+    }
+
+    .alarm-ringing-anim {
+      animation: pulse-ring 1.2s infinite ease-in-out;
+    }
+
+    @keyframes eq-bar {
+      0%, 100% { height: 5px; }
+      50% { height: 20px; }
+    }
+
+    .eq-active span {
+      animation: eq-bar 0.45s infinite ease-in-out;
+    }
+    .eq-active span:nth-child(2) { animation-delay: 0.1s; }
+    .eq-active span:nth-child(3) { animation-delay: 0.2s; }
+    .eq-active span:nth-child(4) { animation-delay: 0.15s; }
+    .eq-active span:nth-child(5) { animation-delay: 0.05s; }
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(var(--accent-rgb), 0.3);
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="w-full min-h-screen p-2.5 sm:p-3.5 flex flex-col gap-3.5 relative">
+
+  <!-- Full-Screen 60FPS Dazzling Animated Canvas Background -->
+  <canvas id="bgAnimatedCanvas"></canvas>
+
+  <!-- Edge-to-Edge Luxury Header Bar -->
+  <header class="w-full relative z-10">
+    <div class="lux-card rounded-2xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
+      <!-- Brand -->
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl flex items-center justify-center lux-btn-primary">
+          <svg class="w-5 h-5 text-slate-950" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="13" r="8"></circle>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4l2.5 2.5M9 2h6"></path>
+          </svg>
+        </div>
+        <h1 class="mono-digits text-lg sm:text-xl font-semibold tracking-[0.18em] text-white">CHRONO<span class="accent-text font-light">LUX</span></h1>
+      </div>
+
+      <!-- Main Navigation Tabs (Timer vs Statistics) -->
+      <nav class="glass-mini rounded-xl p-1 flex items-center gap-1" aria-label="التنقل الرئيسي">
+        <button type="button" id="navTabTimerBtn" onclick="switchMainView('timer')" class="px-4 py-1.5 rounded-lg lux-btn-primary text-slate-950 text-xs font-semibold flex items-center gap-2 transition cursor-pointer">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9"></circle>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 7v5l3 2"></path>
+          </svg>
+          <span>المؤقت والمنبه</span>
+        </button>
+        <button type="button" id="navTabStatsBtn" onclick="switchMainView('stats')" class="px-4 py-1.5 rounded-lg text-slate-300 hover:text-white text-xs font-normal flex items-center gap-2 transition cursor-pointer">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M18 20V10M12 20V4M6 20v-6"></path>
+          </svg>
+          <span>إحصائيات المؤقت</span>
+        </button>
+      </nav>
+
+      <!-- Animated Background Scene Selector + Theme + Clock -->
+      <div class="flex flex-wrap items-center gap-2.5">
+        <!-- Animated Background Selector -->
+        <select id="bgSceneSelect" onchange="setAnimatedBackgroundScene(this.value)" aria-label="نوع الخلفية المتحركة" class="glass-mini rounded-xl px-3 py-1.5 text-xs text-slate-200 font-normal outline-none focus:border-emerald-400/50 cursor-pointer">
+          <option value="aurora">🌌 الشفق القطبي والقمم الجليدية</option>
+          <option value="nebula">🔮 الشبكة السيبرانية ثلاثية الأبعاد</option>
+          <option value="plasma">🌊 محيط الذهب السائل وموجات الصوت</option>
+          <option value="galaxy">🌠 المجرة الحلزونية والشهب النيزكية</option>
+          <option value="royal">⌚ التوربيون السويسري الميكانيكي الفاخر</option>
+        </select>
+
+        <!-- Theme Color Dots -->
+        <div class="flex items-center gap-1.5 glass-mini rounded-xl p-1.5" role="group" aria-label="اللون">
+          <button type="button" id="themeEmeraldBtn" onclick="setLuxuryTheme('emerald')" title="زمردي" class="w-4 h-4 rounded-full bg-gradient-to-br from-emerald-300 to-emerald-600 ring-1 ring-white/60 transition-transform hover:scale-110 cursor-pointer"></button>
+          <button type="button" id="themeGoldBtn" onclick="setLuxuryTheme('gold')" title="ذهبي" class="w-4 h-4 rounded-full bg-gradient-to-br from-amber-200 to-yellow-600 opacity-75 hover:opacity-100 transition-transform hover:scale-110 cursor-pointer"></button>
+          <button type="button" id="themeSapphireBtn" onclick="setLuxuryTheme('sapphire')" title="ياقوتي" class="w-4 h-4 rounded-full bg-gradient-to-br from-sky-300 to-blue-600 opacity-75 hover:opacity-100 transition-transform hover:scale-110 cursor-pointer"></button>
+          <button type="button" id="themeCrimsonBtn" onclick="setLuxuryTheme('crimson')" title="عقيقي" class="w-4 h-4 rounded-full bg-gradient-to-br from-rose-300 to-red-600 opacity-75 hover:opacity-100 transition-transform hover:scale-110 cursor-pointer"></button>
+        </div>
+
+        <!-- Live Wall Clock -->
+        <div class="glass-mini rounded-xl px-3.5 py-1.5 flex items-center gap-2">
+          <span class="w-1.5 h-1.5 rounded-full accent-bg animate-pulse"></span>
+          <div id="liveWallClock" class="mono-digits text-xs sm:text-sm font-medium text-slate-100" dir="ltr">09:04:00 AM</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================================================================== -->
+  <!-- VIEW 1: FULL-WIDTH EDGE-TO-EDGE TIMER & ALARM WORKSPACE               -->
+  <!-- ===================================================================== -->
+  <main id="viewTimerWorkspace" class="w-full flex-1 grid grid-cols-1 lg:grid-cols-12 gap-3.5 relative z-10">
+
+    <!-- Right Column (5 cols): Live Direct Minutes Input & Sound Studio -->
+    <section class="lg:col-span-5 flex flex-col gap-3.5">
+
+      <!-- Card 1: Direct Minutes Input (Updates Circle Live on Every Keystroke, No Duplicate Start Button) -->
+      <div class="lux-card rounded-3xl p-5 sm:p-6 flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-sm font-medium text-slate-200 tracking-wide">ضبط الدقائق</h2>
+          <input id="timerTitleInput" type="text" value="مؤقت 500 د" oninput="handleLiveTimerInputEdit()" placeholder="اسم الجلسة..." class="bg-transparent border-b border-white/15 focus:border-emerald-400/60 px-2 py-0.5 text-xs text-slate-200 placeholder-slate-500 outline-none text-left w-40 transition" />
+        </div>
+
+        <!-- Minutes & Seconds Input Boxes (Live Sync with Main Circle) -->
+        <div class="grid grid-cols-12 gap-3 mb-3.5">
+          <div class="col-span-8 bg-transparent border border-white/15 focus-within:border-emerald-400/60 rounded-2xl px-4 py-3.5 transition">
+            <label for="directMinutesInput" class="block text-[11px] font-light text-slate-400 mb-1">الدقائق</label>
+            <input id="directMinutesInput" type="number" min="0" max="99999" value="500" oninput="handleLiveTimerInputEdit()" class="mono-digits w-full bg-transparent text-4xl sm:text-5xl font-semibold text-white outline-none" dir="ltr" />
+          </div>
+
+          <div class="col-span-4 bg-transparent border border-white/15 focus-within:border-emerald-400/50 rounded-2xl px-3.5 py-3.5 transition">
+            <label for="directSecondsInput" class="block text-[11px] font-light text-slate-400 mb-1">الثواني</label>
+            <input id="directSecondsInput" type="number" min="0" max="59" value="0" oninput="handleLiveTimerInputEdit()" class="mono-digits w-full bg-transparent text-4xl sm:text-5xl font-light text-slate-200 outline-none" dir="ltr" />
+          </div>
+        </div>
+
+        <!-- Minimalist Info Pill + Add Parallel Timer Button -->
+        <div class="flex items-center gap-2.5">
+          <div id="inputPreviewBanner" class="flex-1 bg-transparent border border-white/15 rounded-xl px-4 py-3 flex items-center justify-between text-xs text-slate-300 font-light">
+            <span id="previewEquivalentText">8 س و 20 د</span>
+            <span id="previewFinishClockText" class="mono-digits accent-text font-medium" dir="ltr">05:24 PM</span>
+          </div>
+
+          <button type="button" id="spawnParallelBtn" onclick="addParallelTimerFromInput()" class="lux-chip text-slate-100 font-medium rounded-xl py-3 px-4 flex items-center justify-center gap-1.5 text-xs shrink-0 cursor-pointer" title="إضافة كمؤقت إضافي يعمل بالتوازي">
+            <svg class="w-4 h-4 accent-text" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m7-7H5"></path>
+            </svg>
+            <span>+ مؤقت إضافي</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Card 2: Acoustic Sound Studio & Wall-Clock -->
+      <div class="lux-card rounded-3xl p-5 sm:p-6 flex-1 flex flex-col justify-between gap-4">
+        <div>
+          <div class="flex items-center justify-between mb-3.5">
+            <h2 class="text-sm font-medium text-slate-200 tracking-wide">الصوت والمنبه</h2>
+            <div id="soundEqIndicator" class="flex items-end gap-1 h-5 px-2 py-0.5">
+              <span class="w-0.5 accent-bg rounded-full h-1.5 transition-all"></span>
+              <span class="w-0.5 accent-bg rounded-full h-2.5 transition-all"></span>
+              <span class="w-0.5 accent-bg rounded-full h-1 transition-all"></span>
+              <span class="w-0.5 accent-bg rounded-full h-3 transition-all"></span>
+              <span class="w-0.5 accent-bg rounded-full h-1.5 transition-all"></span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-12 gap-2.5 mb-3">
+            <div class="col-span-8">
+              <select id="alarmToneSelect" onchange="handleToneChange()" aria-label="نغمة الرنين" class="w-full glass-mini rounded-xl px-3.5 py-2.5 text-xs text-slate-100 font-medium outline-none focus:border-emerald-400/50 cursor-pointer">
+                <option value="piano" class="bg-slate-950 text-white">🎹 سيمفونية البيانو الملكي والأوتار</option>
+                <option value="harp" class="bg-slate-950 text-white">🎸 العود الشرقي الأصيل والهارب (مقام الحجاز)</option>
+                <option value="kalimba" class="bg-slate-950 text-white">🥁 إيقاع الماريمبا الأفريقي والنبض العميق</option>
+                <option value="chimes" class="bg-slate-950 text-white">🔔 أجراس الكاتدرائية العملاقة (رنين مهيب)</option>
+                <option value="quartz" class="bg-slate-950 text-white">🚨 منبه الكوارتز الرقمي الحاد (بيب متسارع)</option>
+                <option value="cyber" class="bg-slate-950 text-white">⚡ نبض السايبربانك الإلكتروني (Synthwave)</option>
+              </select>
+            </div>
+            <div class="col-span-4">
+              <button type="button" id="testSoundBtn" onclick="toggleTestAlarmSound()" class="w-full h-full lux-chip rounded-xl px-3 text-xs font-medium text-slate-100 flex items-center justify-center gap-1.5 cursor-pointer">
+                <svg class="w-3.5 h-3.5 accent-text shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M11 5L6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 010 7.07"></path>
+                </svg>
+                <span id="testSoundBtnText">معاينة</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Custom Audio File Upload Option -->
+          <div class="mb-3">
+            <input id="customAudioFileInput" type="file" accept="audio/*" onchange="handleCustomAudioUpload(event)" class="hidden" />
+            <button type="button" id="uploadCustomSoundBtn" onclick="document.getElementById('customAudioFileInput').click()" class="w-full lux-chip rounded-xl py-2.5 px-3 text-[11px] font-light text-slate-200 flex items-center justify-center gap-2 cursor-pointer">
+              <svg class="w-3.5 h-3.5 accent-text" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"></path>
+              </svg>
+              <span id="customAudioLabel">اختيار ملف صوتي من جهازك (MP3 / WAV)</span>
+            </button>
+          </div>
+
+          <div class="flex items-center justify-between gap-4 bg-transparent rounded-xl px-3.5 py-2.5 border border-white/15">
+            <div class="flex items-center gap-2.5 flex-1">
+              <svg class="w-4 h-4 text-slate-300 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5L6 9H2v6h4l5 4V5z"></path>
+              </svg>
+              <input id="volumeSlider" type="range" min="10" max="100" value="85" oninput="updateVolumeLabel()" aria-label="مستوى الصوت" class="w-full accent-emerald-400 cursor-pointer h-1" />
+              <span id="volumeValueLabel" class="mono-digits text-xs font-medium accent-text w-9 text-left" dir="ltr">85%</span>
+            </div>
+
+            <label class="flex items-center gap-1.5 cursor-pointer text-[11px] text-slate-300 font-light shrink-0">
+              <input id="preAlertCheckbox" type="checkbox" checked class="w-3.5 h-3.5 rounded accent-emerald-500" />
+              <span>تنبيه قبل 5 د</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Set by Specific Time -->
+        <div class="flex items-center gap-2 pt-3 border-t border-white/10">
+          <span class="text-[11px] text-slate-300 font-light shrink-0">منبه بالساعة:</span>
+          <input id="wallClockTargetInput" type="time" value="16:54" aria-label="وقت المنبه" class="glass-mini rounded-xl px-3 py-2 text-xs text-white mono-digits outline-none focus:border-emerald-400/50 flex-1" />
+          <button type="button" id="setByWallClockBtn" onclick="setTimerFromWallClock()" class="lux-chip px-4 py-2 rounded-xl text-xs font-medium text-slate-100 cursor-pointer">
+            ضبط
+          </button>
+        </div>
+      </div>
+
+      <!-- Card 3: Parallel Timers List -->
+      <div class="lux-card rounded-3xl p-5 flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-2.5">
+          <div class="flex items-center gap-2">
+            <h3 class="text-xs sm:text-sm font-medium text-slate-200">المؤقتات المتوازية</h3>
+            <span id="parallelCountBadge" class="mono-digits px-2 py-0.5 rounded-full text-[11px] font-medium bg-white/10 accent-text">2</span>
+          </div>
+          <button type="button" id="clearFinishedParallelBtn" onclick="clearCompletedParallelTimers()" class="text-[11px] text-slate-400 hover:text-white font-light transition cursor-pointer">
+            مسح المنتهية
+          </button>
+        </div>
+
+        <div id="parallelTimersList" class="space-y-2 max-h-36 overflow-y-auto pr-1"></div>
+      </div>
+
+    </section>
+
+    <!-- Left Column (7 cols): Full-Height Centerpiece Chronograph Card -->
+    <section class="lg:col-span-7 flex flex-col">
+
+      <div class="lux-card lux-border-glow rounded-3xl p-6 sm:p-8 flex-1 flex flex-col items-center justify-between relative overflow-hidden">
+
+        <!-- Top Status & Display Switcher -->
+        <div class="w-full flex items-center justify-between gap-3 z-10">
+          <div class="flex items-center gap-2.5">
+            <span id="timerStateBadge" class="px-3.5 py-1 rounded-full text-xs font-medium glass-mini text-slate-100 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full accent-bg"></span>
+              <span id="timerStateText">جاهز</span>
+            </span>
+            <span id="activeTimerTitleBadge" class="text-xs sm:text-sm font-light text-slate-300 truncate max-w-[220px]">مؤقت 500 د</span>
+          </div>
+
+          <div class="glass-mini rounded-xl p-1 flex items-center text-xs">
+            <button type="button" id="modePureMinutesBtn" onclick="setDisplayFormat('minutes')" class="px-4 py-1.5 rounded-lg lux-btn-primary text-slate-950 font-semibold transition cursor-pointer">
+              دقائق
+            </button>
+            <button type="button" id="modeHrsMinsBtn" onclick="setDisplayFormat('hms')" class="px-4 py-1.5 rounded-lg text-slate-300 hover:text-white font-light transition cursor-pointer">
+              ساعات
+            </button>
+          </div>
+        </div>
+
+        <!-- Giant Swiss Chronograph Dial -->
+        <div class="relative w-72 h-72 sm:w-96 sm:h-96 flex items-center justify-center my-auto">
+          <svg class="w-full h-full -rotate-90 transform" viewBox="0 0 320 320">
+            <defs>
+              <linearGradient id="luxGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="var(--accent-sec)" />
+                <stop offset="100%" stop-color="var(--accent-main)" />
+              </linearGradient>
+            </defs>
+            <circle cx="160" cy="160" r="148" stroke="rgba(255,255,255,0.07)" stroke-width="1" fill="none" stroke-dasharray="2 6" />
+            <circle cx="160" cy="160" r="134" stroke="rgba(255,255,255,0.1)" stroke-width="7.5" fill="transparent" />
+            <circle id="mainProgressCircle" cx="160" cy="160" r="134" stroke="url(#luxGrad)" stroke-width="7.5" stroke-linecap="round" fill="none" stroke-dasharray="841.95" stroke-dashoffset="0" class="ring-progress" />
+            <circle cx="160" cy="160" r="120" stroke="rgba(255,255,255,0.05)" stroke-width="1" fill="none" />
+          </svg>
+
+          <!-- Sculpted Center Readout -->
+          <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
+            <span id="mainReadoutTopLabel" class="text-xs font-light tracking-widest text-slate-300 mb-1">الدقائق المتبقية</span>
+
+            <div id="giantCountdownDisplay" class="mono-digits text-6xl sm:text-7xl font-light text-white tracking-tight drop-shadow-[0_4px_24px_rgba(0,0,0,0.6)]" dir="ltr">
+              500:00
+            </div>
+
+            <div id="secondaryCountdownPill" class="mt-3 px-4 py-1 rounded-full glass-mini text-xs sm:text-sm font-normal accent-text mono-digits" dir="ltr">
+              08:20:00
+            </div>
+
+            <div class="mt-2.5 flex items-center gap-1.5 text-xs text-slate-300 font-light">
+              <svg class="w-3.5 h-3.5 accent-text" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="9"></circle>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 7v5l3 2"></path>
+              </svg>
+              <span id="dialFinishTimeLabel" class="mono-digits" dir="ltr">05:24 PM</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Section: Telemetry Strip + Single Master Start Button -->
+        <div class="w-full flex flex-col gap-3.5 z-10">
+          <div class="w-full grid grid-cols-4 gap-3">
+            <div class="bg-transparent border border-white/15 rounded-2xl py-3 px-3 text-center">
+              <div class="text-[11px] text-slate-400 font-light">المدة</div>
+              <div id="statTotalMinutes" class="mono-digits text-base sm:text-lg font-medium text-white mt-0.5">500m</div>
+            </div>
+            <div class="bg-transparent border border-white/15 rounded-2xl py-3 px-3 text-center">
+              <div class="text-[11px] text-slate-400 font-light">المتبقي</div>
+              <div id="statRemainingMinutes" class="mono-digits text-base sm:text-lg font-medium accent-text mt-0.5">500.0m</div>
+            </div>
+            <div class="bg-transparent border border-white/15 rounded-2xl py-3 px-3 text-center">
+              <div class="text-[11px] text-slate-400 font-light">المنقضي</div>
+              <div id="statElapsedMinutes" class="mono-digits text-base sm:text-lg font-medium text-slate-200 mt-0.5">0.0m</div>
+            </div>
+            <div class="bg-transparent border border-white/15 rounded-2xl py-3 px-3 text-center">
+              <div class="text-[11px] text-slate-400 font-light">الإنجاز</div>
+              <div id="statProgressPercent" class="mono-digits text-base sm:text-lg font-medium text-white mt-0.5" dir="ltr">0.0%</div>
+            </div>
+          </div>
+
+          <!-- Single Master Start / Pause Button + Reset + Demo -->
+          <div class="w-full flex items-center justify-center gap-3">
+            <button type="button" id="mainToggleRunBtn" onclick="toggleMainTimerRun()" class="lux-btn-primary rounded-2xl px-10 py-4 text-base font-semibold flex items-center gap-2.5 min-w-[210px] justify-center cursor-pointer">
+              <span id="mainToggleRunIcon" class="w-4 h-4 flex items-center justify-center">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
+              </span>
+              <span id="mainToggleRunText">تشغيل</span>
+            </button>
+
+            <button type="button" id="mainResetBtn" onclick="resetMainTimer()" class="lux-chip text-slate-100 font-normal rounded-2xl px-6 py-4 text-xs sm:text-sm flex items-center gap-2 cursor-pointer">
+              <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
+              <span>إعادة</span>
+            </button>
+
+            <button type="button" id="triggerDemoAlarmBtn" onclick="triggerAlarmModalNow('معاينة التنبيه')" class="lux-chip text-slate-200 font-normal rounded-2xl px-5 py-4 text-xs sm:text-sm flex items-center gap-2 cursor-pointer" title="معاينة شاشة الرنين">
+              <svg class="w-4 h-4 accent-text" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+              </svg>
+              <span>تجربة الرنين</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- VIEW 2: INFINITE DAILY STATISTICS & ANALYTICS WORKSPACE               -->
+  <!-- ===================================================================== -->
+  <section id="viewStatsWorkspace" class="w-full flex-1 hidden flex-col gap-3.5 relative z-10">
+
+    <!-- Top 4 Summary KPI Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+      <div class="lux-card rounded-3xl p-5">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-light text-slate-300">ساعات اليوم</span>
+          <span id="statCardTodayDiff" class="mono-digits text-[11px] px-2.5 py-0.5 rounded-full bg-black/40 accent-text" dir="ltr">+0%</span>
+        </div>
+        <div id="statCardTodayHours" class="mono-digits text-3xl font-semibold text-white" dir="ltr">0.0 h</div>
+        <div id="statCardTodayMinutes" class="text-xs text-slate-300 font-light mt-1">0 دقيقة</div>
+      </div>
+
+      <div class="lux-card rounded-3xl p-5">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-light text-slate-300">ساعات أمس</span>
+          <span class="text-[11px] text-slate-400 font-light">اليوم السابق</span>
+        </div>
+        <div id="statCardYesterdayHours" class="mono-digits text-3xl font-semibold text-slate-100" dir="ltr">0.0 h</div>
+        <div id="statCardYesterdayMinutes" class="text-xs text-slate-300 font-light mt-1">0 دقيقة</div>
+      </div>
+
+      <div class="lux-card rounded-3xl p-5">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-light text-slate-300">آخر 7 أيام</span>
+          <span id="statCardWeekAvg" class="text-[11px] accent-text font-light">المعدل: 0 س/يوم</span>
+        </div>
+        <div id="statCardWeekHours" class="mono-digits text-3xl font-semibold text-slate-100" dir="ltr">0.0 h</div>
+        <div id="statCardWeekMinutes" class="text-xs text-slate-300 font-light mt-1">0 دقيقة</div>
+      </div>
+
+      <div class="lux-card rounded-3xl p-5">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-light text-slate-300">الإجمالي التراكمي الكلي</span>
+          <span id="statCardTotalDaysBadge" class="mono-digits text-[11px] text-slate-300">0 يوم</span>
+        </div>
+        <div id="statCardAllTimeHours" class="mono-digits text-3xl font-semibold accent-text" dir="ltr">0.0 h</div>
+        <div id="statCardAllTimeMinutes" class="text-xs text-slate-300 font-light mt-1">0 دقيقة مسجلة</div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5">
+      <!-- Main Daily Hours Bar/Line Chart -->
+      <div class="lg:col-span-8 lux-card rounded-3xl p-5 sm:p-6">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div>
+            <h3 class="text-sm font-medium text-white">المخطط البياني لساعات المؤقت اليومية</h3>
+            <p class="text-[11px] text-slate-300 font-light mt-0.5">مقارنة ساعات ودقائق الإنجاز لكل يوم</p>
+          </div>
+          <div class="glass-mini rounded-xl p-1 flex items-center text-xs">
+            <button type="button" id="chartRange7Btn" onclick="setStatsChartRange(7)" class="px-3 py-1 rounded-lg text-slate-300 hover:text-white font-light transition cursor-pointer">7 أيام</button>
+            <button type="button" id="chartRange14Btn" onclick="setStatsChartRange(14)" class="px-3 py-1 rounded-lg lux-btn-primary text-slate-950 font-medium transition cursor-pointer">14 يوماً</button>
+            <button type="button" id="chartRangeAllBtn" onclick="setStatsChartRange(0)" class="px-3 py-1 rounded-lg text-slate-300 hover:text-white font-light transition cursor-pointer">كل الأيام</button>
+          </div>
+        </div>
+        <div class="relative h-72 w-full">
+          <canvas id="dailyHoursChartCanvas"></canvas>
+        </div>
+      </div>
+
+      <!-- Comparison & Manual Entry Card -->
+      <div class="lg:col-span-4 lux-card rounded-3xl p-5 sm:p-6 flex flex-col justify-between gap-4">
+        <div>
+          <h3 class="text-sm font-medium text-white mb-1">مقارنة اليوم وأمس والمعدل</h3>
+          <p class="text-[11px] text-slate-300 font-light mb-3">تحليل التوازن اليومي بالساعات</p>
+          <div class="relative h-48 w-full">
+            <canvas id="comparisonChartCanvas"></canvas>
+          </div>
+        </div>
+
+        <!-- Quick Log / Edit Specific Day -->
+        <div class="pt-4 border-t border-white/10">
+          <div class="text-xs font-medium text-slate-200 mb-2.5">إضافة أو تعديل دقائق ليوم محدد</div>
+          <div class="grid grid-cols-12 gap-2 mb-2">
+            <input id="manualLogDateInput" type="date" aria-label="التاريخ" class="col-span-7 glass-mini rounded-xl px-3 py-2 text-xs text-white mono-digits outline-none focus:border-emerald-400/50" />
+            <input id="manualLogMinutesInput" type="number" min="1" max="14400" value="300" placeholder="الدقائق" aria-label="الدقائق" class="col-span-5 glass-mini rounded-xl px-3 py-2 text-xs text-white mono-digits outline-none focus:border-emerald-400/50" dir="ltr" />
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" id="addManualLogBtn" onclick="saveManualDayLog('add')" class="lux-btn-primary rounded-xl py-2 text-xs font-semibold cursor-pointer">
+              + إضافة لليوم
+            </button>
+            <button type="button" id="setManualLogBtn" onclick="saveManualDayLog('set')" class="lux-chip rounded-xl py-2 text-xs font-normal text-slate-100 cursor-pointer">
+              تعيين كقيمة لليوم
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Infinite Day-by-Day Table Card -->
+    <div class="lux-card rounded-3xl p-5 sm:p-6 flex-1">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <div>
+          <h3 class="text-sm font-medium text-white">السجل اليومي المفتوح بلا نهاية</h3>
+          <p class="text-[11px] text-slate-300 font-light mt-0.5">يُحفظ تلقائياً لكل يوم يمر مع تفاصيل الساعات والدقائق والجلسات</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <input id="statsTableSearchInput" type="text" oninput="renderInfiniteDailyTable()" placeholder="بحث بالتاريخ أو اليوم..." class="glass-mini rounded-xl px-3.5 py-1.5 text-xs text-white placeholder-slate-400 outline-none focus:border-emerald-400/50 w-44" />
+          <button type="button" id="exportStatsCsvBtn" onclick="exportDailyStatsCSV()" class="lux-chip px-3.5 py-1.5 rounded-xl text-xs font-normal text-slate-100 cursor-pointer">
+            تصدير جدول CSV
+          </button>
+          <button type="button" id="resetSampleStatsBtn" onclick="clearAllStatsHistory()" class="lux-chip px-3 py-1.5 rounded-xl text-xs font-light text-rose-300 hover:text-rose-200 cursor-pointer">
+            تصفير السجل
+          </button>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto max-h-80 overflow-y-auto rounded-2xl border border-white/10">
+        <table class="w-full text-right text-xs">
+          <thead class="bg-black/65 text-slate-300 font-normal sticky top-0 backdrop-blur-md">
+            <tr>
+              <th class="py-3.5 px-4">اليوم والتاريخ</th>
+              <th class="py-3.5 px-4">الدقائق</th>
+              <th class="py-3.5 px-4">الساعات (تفصيلي)</th>
+              <th class="py-3.5 px-4">الساعات (عشري)</th>
+              <th class="py-3.5 px-4">الجلسات</th>
+              <th class="py-3.5 px-4 w-44">مؤشر الإنجاز</th>
+              <th class="py-3.5 px-4 text-left">إجراء</th>
+            </tr>
+          </thead>
+          <tbody id="infiniteDailyTableBody" class="divide-y divide-white/[0.06] text-slate-100"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Minimalist Toast -->
+  <div id="luxToast" class="fixed bottom-5 left-5 z-40 hidden bg-slate-950/90 border border-white/20 text-slate-100 px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2.5 text-xs font-normal backdrop-blur-xl">
+    <span class="w-1.5 h-1.5 rounded-full accent-bg"></span>
+    <span id="luxToastText">تم التحديث</span>
+  </div>
+
+  <!-- Full-Screen Alarm Modal -->
+  <div id="alarmRingingModal" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-2xl flex items-center justify-center p-4">
+    <div class="lux-card lux-border-glow max-w-md w-full rounded-3xl p-8 text-center relative overflow-hidden alarm-ringing-anim">
+      <div class="w-16 h-16 rounded-2xl lux-btn-primary mx-auto flex items-center justify-center mb-5 shadow-2xl">
+        <svg class="w-8 h-8 text-slate-950" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+        </svg>
+      </div>
+
+      <h2 id="modalAlarmTitle" class="text-2xl font-semibold text-white mb-1">انتهى الوقت</h2>
+      <p id="modalAlarmSubtitle" class="text-xs text-slate-300 font-light mb-5">اكتمل المؤقت المحدد</p>
+
+      <div class="bg-black/45 border border-white/10 rounded-2xl py-3 px-4 mb-6">
+        <div class="text-[10px] text-slate-400 font-light">الوقت الإضافي</div>
+        <div id="modalOvertimeCounter" class="mono-digits text-2xl font-medium accent-text mt-0.5" dir="ltr">+00:00</div>
+      </div>
+
+      <button type="button" id="stopAlarmBtn" onclick="dismissAlarmModal()" class="w-full lux-btn-primary rounded-2xl py-3.5 text-sm font-semibold mb-3 cursor-pointer">
+        إيقاف المنبه
+      </button>
+
+      <div class="grid grid-cols-3 gap-2">
+        <button type="button" onclick="snoozeAlarmMinutes(5)" class="lux-chip rounded-xl py-2.5 text-xs font-light text-slate-200 cursor-pointer">
+          +5 دقائق
+        </button>
+        <button type="button" onclick="snoozeAlarmMinutes(10)" class="lux-chip rounded-xl py-2.5 text-xs font-light text-slate-200 cursor-pointer">
+          +10 دقائق
+        </button>
+        <button type="button" onclick="snoozeAlarmMinutes(30)" class="lux-chip rounded-xl py-2.5 text-xs font-light accent-text cursor-pointer">
+          +30 دقيقة
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 60FPS ULTRA-DISTINCT MASTERPIECE ANIMATED BACKGROUND ENGINE (5 WORLDS)
+    // =========================================================================
+    let bgSceneMode = 'aurora';
+    let bgStars = [];
+    let bgAuroraCurtains = [];
+    let bgMountains = [];
+    let bgCyberNodes = [];
+    let bgMatrixDrops = [];
+    let bgGoldOrbs = [];
+    let bgSpiralStars = [];
+    let bgMeteors = [];
+    let bgGears = [];
+    let bgAnimPhase = 0;
+
+    function parseRgbVar(varName, fallback) {
+      const raw = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+      if (!raw) return fallback;
+      const parts = raw.split(',').map((x) => parseInt(x.trim(), 10));
+      return parts.length === 3 && !parts.some(isNaN) ? parts : fallback;
+    }
+
+    function initAnimatedBackgroundObjects() {
+      const w = window.innerWidth || 1280;
+      const h = window.innerHeight || 800;
+
+      // 1. Aurora Borealis & Ice Peaks data
+      bgStars = Array.from({ length: 140 }, () => ({
+        x: Math.random() * w,
+        y: Math.random() * h * 0.78,
+        r: Math.random() * 1.8 + 0.4,
+        phase: Math.random() * Math.PI * 2,
+        speed: Math.random() * 0.04 + 0.015
+      }));
+
+      bgAuroraCurtains = [
+        { yBase: h * 0.22, height: h * 0.36, color1: [16, 245, 160], color2: [6, 182, 212], freq: 0.0028, speed: 0.9, offset: 0 },
+        { yBase: h * 0.16, height: h * 0.40, color1: [56, 189, 248], color2: [168, 85, 247], freq: 0.0036, speed: -1.15, offset: 2.1 },
+        { yBase: h * 0.28, height: h * 0.30, color1: [52, 211, 153], color2: [236, 72, 153], freq: 0.0021, speed: 0.65, offset: 4.3 }
+      ];
+
+      // Generate jagged mountain silhouettes for Aurora scene
+      bgMountains = [[], []];
+      const steps = 48;
+      for (let i = 0; i <= steps; i++) {
+        const px = (w / steps) * i;
+        const n1 = Math.sin(i * 0.45) * 42 + Math.cos(i * 1.1) * 24 + Math.sin(i * 2.3) * 11;
+        const n2 = Math.cos(i * 0.38 + 1.2) * 32 + Math.sin(i * 0.95) * 18 + Math.cos(i * 2.1) * 9;
+        bgMountains[0].push({ x: px, y: h * 0.77 - Math.abs(n1) });
+        bgMountains[1].push({ x: px, y: h * 0.84 - Math.abs(n2) });
+      }
+
+      // 2. Cyber Grid & Matrix Rain data (Nebula / Cyber)
+      bgCyberNodes = Array.from({ length: 42 }, () => ({
+        x: Math.random() * w,
+        y: Math.random() * h * 0.65,
+        vx: (Math.random() - 0.5) * 1.1,
+        vy: (Math.random() - 0.5) * 0.9,
+        r: Math.random() * 2.5 + 1.2
+      }));
+
+      const cols = Math.floor(w / 28);
+      bgMatrixDrops = Array.from({ length: cols }, (_, i) => ({
+        x: i * 28 + 10,
+        y: Math.random() * h,
+        speed: Math.random() * 3.5 + 1.8,
+        len: Math.floor(Math.random() * 12 + 6),
+        charSeed: Math.floor(Math.random() * 100)
+      }));
+
+      // 3. Liquid Gold Ocean & Acoustic Equalizer Waves (Plasma)
+      bgGoldOrbs = Array.from({ length: 55 }, () => ({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: Math.random() * 3.8 + 1.0,
+        vy: -(Math.random() * 1.3 + 0.4),
+        vx: (Math.random() - 0.5) * 0.7,
+        alpha: Math.random() * 0.75 + 0.25,
+        hue: Math.random() > 0.4 ? 'gold' : 'rose'
+      }));
+
+      // 4. Deep Spiral Galaxy Vortex & Blazing Meteors (Galaxy)
+      bgSpiralStars = Array.from({ length: 320 }, (_, idx) => {
+        const arm = idx % 3;
+        const distRatio = Math.pow(Math.random(), 0.75);
+        const radius = distRatio * Math.min(w, h) * 0.58 + 12;
+        const baseAngle = (arm * (Math.PI * 2)) / 3 + distRatio * 4.5 + (Math.random() - 0.5) * 0.55;
+        const colors = [
+          [255, 230, 180],
+          [147, 197, 253],
+          [244, 114, 182],
+          [167, 139, 250],
+          [110, 231, 183]
+        ];
+        return {
+          radius,
+          angle: baseAngle,
+          speed: (0.0045 / (0.25 + distRatio)) * 0.65,
+          size: (1 - distRatio * 0.6) * 2.4 + 0.5,
+          col: colors[idx % colors.length],
+          twinkle: Math.random() * Math.PI * 2
+        };
+      });
+
+      bgMeteors = Array.from({ length: 5 }, () => ({
+        x: Math.random() * w * 1.4,
+        y: Math.random() * h * 0.6 - 200,
+        len: 130 + Math.random() * 120,
+        speed: 9 + Math.random() * 7,
+        thickness: 2 + Math.random() * 1.5
+      }));
+
+      // 5. Swiss Mechanical Tourbillon & Celestial Astrolabe (Royal)
+      bgGears = [
+        { cxRatio: 0.5, cyRatio: 0.5, r: 290, teeth: 48, speed: 0.0022, angle: 0, color: [212, 175, 55], alpha: 0.28, spokes: 6 },
+        { cxRatio: 0.5, cyRatio: 0.5, r: 215, teeth: 36, speed: -0.0035, angle: 0.5, color: [243, 229, 171], alpha: 0.24, spokes: 8 },
+        { cxRatio: 0.5, cyRatio: 0.5, r: 140, teeth: 24, speed: 0.006, angle: 1.1, color: [16, 185, 129], alpha: 0.25, spokes: 5 },
+        { cxRatio: 0.22, cyRatio: 0.28, r: 125, teeth: 28, speed: -0.0045, angle: 0.2, color: [212, 175, 55], alpha: 0.20, spokes: 4 },
+        { cxRatio: 0.78, cyRatio: 0.72, r: 145, teeth: 32, speed: 0.004, angle: 0.9, color: [212, 175, 55], alpha: 0.20, spokes: 6 },
+        { cxRatio: 0.80, cyRatio: 0.24, r: 105, teeth: 22, speed: -0.0055, angle: 1.7, color: [56, 189, 248], alpha: 0.18, spokes: 5 },
+        { cxRatio: 0.18, cyRatio: 0.76, r: 115, teeth: 24, speed: 0.005, angle: 2.3, color: [245, 158, 11], alpha: 0.19, spokes: 4 }
+      ];
+    }
+
+    function setAnimatedBackgroundScene(sceneName) {
+      bgSceneMode = sceneName;
+      const sceneTitles = {
+        aurora: 'الشفق القطبي والقمم الجليدية 🌌',
+        nebula: 'الشبكة السيبرانية ثلاثية الأبعاد 🔮',
+        plasma: 'محيط الذهب السائل وموجات الصوت 🌊',
+        galaxy: 'المجرة الحلزونية والشهب النيزكية 🌠',
+        royal: 'التوربيون السويسري الميكانيكي الفاخر ⌚'
+      };
+      showLuxuryToast(`تم تفعيل خلفية: ${sceneTitles[sceneName] || sceneName}`);
+      try {
+        localStorage.setItem('chronolux_bg_scene', sceneName);
+      } catch (e) {}
+    }
+
+    function drawMechanicalGear(ctx, cx, cy, radius, teeth, angle, col, alpha, spokes) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(angle);
+      ctx.strokeStyle = `rgba(${col[0]}, ${col[1]}, ${col[2]}, ${alpha})`;
+      ctx.fillStyle = `rgba(${col[0]}, ${col[1]}, ${col[2]}, ${alpha * 0.18})`;
+      ctx.lineWidth = 1.6;
+
+      // Outer gear teeth
+      ctx.beginPath();
+      const outerR = radius + 8;
+      const innerR = radius - 5;
+      for (let i = 0; i < teeth; i++) {
+        const a1 = (i / teeth) * Math.PI * 2;
+        const a2 = ((i + 0.25) / teeth) * Math.PI * 2;
+        const a3 = ((i + 0.5) / teeth) * Math.PI * 2;
+        const a4 = ((i + 0.75) / teeth) * Math.PI * 2;
+        if (i === 0) ctx.moveTo(Math.cos(a1) * innerR, Math.sin(a1) * innerR);
+        ctx.lineTo(Math.cos(a2) * outerR, Math.sin(a2) * outerR);
+        ctx.lineTo(Math.cos(a3) * outerR, Math.sin(a3) * outerR);
+        ctx.lineTo(Math.cos(a4) * innerR, Math.sin(a4) * innerR);
+      }
+      ctx.closePath();
+      ctx.stroke();
+
+      // Inner rings
+      ctx.beginPath();
+      ctx.arc(0, 0, radius * 0.78, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(0, 0, radius * 0.22, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Precision spokes
+      for (let s = 0; s < spokes; s++) {
+        const sa = (s / spokes) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(sa) * (radius * 0.22), Math.sin(sa) * (radius * 0.22));
+        ctx.lineTo(Math.cos(sa) * (radius * 0.78), Math.sin(sa) * (radius * 0.78));
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function renderAnimatedBackgroundFrame() {
+      const canvas = document.getElementById('bgAnimatedCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+
+      bgAnimPhase += 0.016;
+
+      const c1 = parseRgbVar('--accent-rgb', [16, 185, 129]);
+      const c2 = parseRgbVar('--accent-2-rgb', [56, 189, 248]);
+      const c3 = parseRgbVar('--accent-3-rgb', [212, 175, 55]);
+
+      ctx.globalCompositeOperation = 'source-over';
+
+      // =====================================================================
+      // SCENE 1: AURORA BOREALIS & ARCTIC MOUNTAINS + WATER REFLECTION
+      // =====================================================================
+      if (bgSceneMode === 'aurora') {
+        const skyGrad = ctx.createLinearGradient(0, 0, 0, h);
+        skyGrad.addColorStop(0, '#010513');
+        skyGrad.addColorStop(0.55, '#041428');
+        skyGrad.addColorStop(0.8, '#072238');
+        skyGrad.addColorStop(1, '#020914');
+        ctx.fillStyle = skyGrad;
+        ctx.fillRect(0, 0, w, h);
+
+        // Twinkling arctic stars
+        bgStars.forEach((st) => {
+          st.phase += st.speed;
+          const al = 0.3 + Math.sin(st.phase) * 0.45;
+          if (al > 0) {
+            ctx.fillStyle = `rgba(225, 245, 255, ${al})`;
+            ctx.beginPath();
+            ctx.arc(st.x, st.y, st.r, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        });
+
+        // Vertical shimmering Aurora Borealis curtains
+        ctx.globalCompositeOperation = 'screen';
+        bgAuroraCurtains.forEach((curtain, cIdx) => {
+          const step = 14;
+          for (let x = 0; x < w; x += step) {
+            const wave1 = Math.sin(x * curtain.freq + bgAnimPhase * curtain.speed + curtain.offset) * 55;
+            const wave2 = Math.cos(x * curtain.freq * 1.9 - bgAnimPhase * 0.7 + cIdx) * 28;
+            const topY = curtain.yBase + wave1 + wave2;
+            const rayH = curtain.height + Math.sin(x * 0.008 + bgAnimPhase * 1.6) * 45;
+            const intensity = (Math.sin(x * 0.012 + bgAnimPhase * 2.1 + cIdx) * 0.4 + 0.6) * 0.28;
+
+            const rayGrad = ctx.createLinearGradient(x, topY, x, topY + rayH);
+            rayGrad.addColorStop(0, 'rgba(0,0,0,0)');
+            rayGrad.addColorStop(0.25, `rgba(${curtain.color1[0]}, ${curtain.color1[1]}, ${curtain.color1[2]}, ${intensity})`);
+            rayGrad.addColorStop(0.7, `rgba(${curtain.color2[0]}, ${curtain.color2[1]}, ${curtain.color2[2]}, ${intensity * 0.75})`);
+            rayGrad.addColorStop(1, 'rgba(0,0,0,0)');
+
+            ctx.fillStyle = rayGrad;
+            ctx.fillRect(x, topY, step + 2, rayH);
+          }
+        });
+        ctx.globalCompositeOperation = 'source-over';
+
+        // Back Mountain Range
+        if (bgMountains[0] && bgMountains[0].length) {
+          ctx.beginPath();
+          ctx.moveTo(0, h * 0.84);
+          bgMountains[0].forEach((pt) => ctx.lineTo(pt.x, pt.y));
+          ctx.lineTo(w, h * 0.84);
+          ctx.closePath();
+          ctx.fillStyle = '#051324';
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(52, 211, 153, 0.28)';
+          ctx.lineWidth = 1.2;
+          ctx.stroke();
+        }
+
+        // Front Mountain Range
+        if (bgMountains[1] && bgMountains[1].length) {
+          ctx.beginPath();
+          ctx.moveTo(0, h * 0.85);
+          bgMountains[1].forEach((pt) => ctx.lineTo(pt.x, pt.y));
+          ctx.lineTo(w, h * 0.85);
+          ctx.closePath();
+          ctx.fillStyle = '#020813';
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(56, 189, 248, 0.22)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+
+        // Arctic Lake Water Reflection at bottom 15%
+        const lakeY = h * 0.84;
+        const lakeGrad = ctx.createLinearGradient(0, lakeY, 0, h);
+        lakeGrad.addColorStop(0, 'rgba(6, 40, 55, 0.85)');
+        lakeGrad.addColorStop(1, '#01040c');
+        ctx.fillStyle = lakeGrad;
+        ctx.fillRect(0, lakeY, w, h - lakeY);
+
+        // Shimmering horizontal water ripples
+        ctx.globalCompositeOperation = 'screen';
+        for (let r = 0; r < 22; r++) {
+          const ry = lakeY + 6 + r * ((h - lakeY) / 22);
+          const rw = 80 + Math.sin(bgAnimPhase * 2 + r) * 45;
+          const rx = ((w * 0.5) + Math.sin(r * 1.7 + bgAnimPhase * 0.6) * (w * 0.38)) - rw / 2;
+          ctx.fillStyle = r % 2 === 0 ? 'rgba(16, 245, 160, 0.16)' : 'rgba(56, 189, 248, 0.14)';
+          ctx.fillRect(rx, ry, rw, 2);
+        }
+        ctx.globalCompositeOperation = 'source-over';
+      }
+
+      // =====================================================================
+      // SCENE 2: CYBERPUNK SYNTHWAVE 3D PERSPECTIVE GRID & DIGITAL MATRIX
+      // =====================================================================
+      else if (bgSceneMode === 'nebula') {
+        const cyberGrad = ctx.createLinearGradient(0, 0, 0, h);
+        cyberGrad.addColorStop(0, '#05010d');
+        cyberGrad.addColorStop(0.52, '#14052b');
+        cyberGrad.addColorStop(0.58, '#2e0854');
+        cyberGrad.addColorStop(1, '#050110');
+        ctx.fillStyle = cyberGrad;
+        ctx.fillRect(0, 0, w, h);
+
+        const horizonY = h * 0.56;
+
+        // Digital Matrix Laser Streams in upper sky
+        ctx.fillStyle = 'rgba(0, 245, 212, 0.16)';
+        bgMatrixDrops.forEach((d, idx) => {
+          d.y += d.speed;
+          if (d.y > horizonY) d.y = -40;
+          const trailGrad = ctx.createLinearGradient(d.x, d.y - d.len * 8, d.x, d.y);
+          trailGrad.addColorStop(0, 'rgba(0, 245, 212, 0)');
+          trailGrad.addColorStop(0.8, 'rgba(0, 245, 212, 0.18)');
+          trailGrad.addColorStop(1, idx % 3 === 0 ? 'rgba(244, 63, 94, 0.55)' : 'rgba(0, 245, 212, 0.65)');
+          ctx.fillStyle = trailGrad;
+          ctx.fillRect(d.x, d.y - d.len * 8, 2, d.len * 8);
+        });
+
+        // Giant Retro-Futuristic Cyber Sun on the Horizon
+        const sunR = Math.min(w, h) * 0.21;
+        const sunGrad = ctx.createLinearGradient(w * 0.5, horizonY - sunR * 1.1, w * 0.5, horizonY + sunR * 0.2);
+        sunGrad.addColorStop(0, '#fde047');
+        sunGrad.addColorStop(0.45, '#f97316');
+        sunGrad.addColorStop(0.85, '#ec4899');
+        sunGrad.addColorStop(1, '#7e22ce');
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(w * 0.5, horizonY - sunR * 0.15, sunR, Math.PI, 0, false);
+        ctx.closePath();
+        ctx.fillStyle = sunGrad;
+        ctx.shadowColor = '#ec4899';
+        ctx.shadowBlur = 45;
+        ctx.fill();
+        ctx.restore();
+
+        // Horizontal synthwave scanline cuts across the sun
+        ctx.fillStyle = '#16052e';
+        for (let s = 0; s < 6; s++) {
+          const cutY = horizonY - sunR * 0.7 + s * (sunR * 0.11) + ((bgAnimPhase * 8) % 12);
+          if (cutY < horizonY && cutY > horizonY - sunR) {
+            ctx.fillRect(w * 0.5 - sunR - 10, cutY, sunR * 2 + 20, 2.5 + s * 0.8);
+          }
+        }
+
+        // 3D Perspective Moving Laser Floor Grid
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0, horizonY, w, h - horizonY);
+        ctx.clip();
+
+        // Radial perspective lines from vanishing point
+        const vpX = w * 0.5;
+        const vpY = horizonY;
+        ctx.strokeStyle = 'rgba(236, 72, 153, 0.42)';
+        ctx.lineWidth = 1.4;
+        for (let i = -18; i <= 18; i++) {
+          ctx.beginPath();
+          ctx.moveTo(vpX + i * 18, vpY);
+          ctx.lineTo(vpX + i * 165, h);
+          ctx.stroke();
+        }
+
+        // Animated horizontal grid bars rushing forward
+        const gridOffset = (bgAnimPhase * 1.4) % 1;
+        for (let j = 0; j < 16; j++) {
+          const p = (j + gridOffset) / 16;
+          const yPos = horizonY + Math.pow(p, 2.35) * (h - horizonY);
+          const alpha = Math.min(0.75, p * 0.85);
+          ctx.strokeStyle = `rgba(56, 189, 248, ${alpha})`;
+          ctx.lineWidth = 1 + p * 1.5;
+          ctx.beginPath();
+          ctx.moveTo(0, yPos);
+          ctx.lineTo(w, yPos);
+          ctx.stroke();
+        }
+        ctx.restore();
+
+        // Glowing Horizon Laser Line
+        ctx.strokeStyle = '#00f5d4';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(0, horizonY);
+        ctx.lineTo(w, horizonY);
+        ctx.stroke();
+      }
+
+      // =====================================================================
+      // SCENE 3: LIQUID GOLD & CRIMSON SILK WAVES + ACOUSTIC SPECTRUM BARS
+      // =====================================================================
+      else if (bgSceneMode === 'plasma') {
+        const bgGrad = ctx.createRadialGradient(w * 0.5, h * 0.45, 40, w * 0.5, h * 0.5, Math.max(w, h) * 0.85);
+        bgGrad.addColorStop(0, '#1f0d05');
+        bgGrad.addColorStop(0.5, '#0f0508');
+        bgGrad.addColorStop(1, '#040204');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, w, h);
+
+        ctx.globalCompositeOperation = 'screen';
+
+        // 7 Interweaving 3D Ribbon Waves of Molten Gold, Amber & Rose
+        const ribbonColors = [
+          [245, 158, 11],
+          [212, 175, 55],
+          [244, 63, 94],
+          [251, 191, 36],
+          [16, 185, 129],
+          [217, 119, 6],
+          [251, 113, 133]
+        ];
+
+        for (let r = 0; r < 7; r++) {
+          const col = ribbonColors[r % ribbonColors.length];
+          const baseY = h * (0.2 + r * 0.1);
+          ctx.beginPath();
+          for (let x = 0; x <= w; x += 18) {
+            const y =
+              baseY +
+              Math.sin(x * 0.0035 + bgAnimPhase * (1.3 + r * 0.18) + r) * (65 + r * 8) +
+              Math.cos(x * 0.006 - bgAnimPhase * 0.95 + r * 1.7) * 32;
+            if (x === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.strokeStyle = `rgba(${col[0]}, ${col[1]}, ${col[2]}, 0.52)`;
+          ctx.lineWidth = 3.2;
+          ctx.stroke();
+
+          ctx.lineTo(w, h);
+          ctx.lineTo(0, h);
+          ctx.closePath();
+          const rg = ctx.createLinearGradient(0, baseY - 80, 0, baseY + 220);
+          rg.addColorStop(0, `rgba(${col[0]}, ${col[1]}, ${col[2]}, 0.22)`);
+          rg.addColorStop(1, 'rgba(0, 0, 0, 0)');
+          ctx.fillStyle = rg;
+          ctx.fill();
+        }
+
+        // Center Symmetrical Acoustic Harmonic Equalizer Bars
+        const barCount = 64;
+        const barSpacing = w / barCount;
+        for (let b = 0; b < barCount; b++) {
+          const bx = b * barSpacing;
+          const amp =
+            Math.abs(Math.sin(b * 0.22 + bgAnimPhase * 3.2) * Math.cos(b * 0.11 - bgAnimPhase * 1.8)) * 95 + 8;
+          ctx.fillStyle = b % 2 === 0 ? 'rgba(251, 191, 36, 0.22)' : 'rgba(244, 63, 94, 0.18)';
+          ctx.fillRect(bx, h - amp, barSpacing * 0.65, amp);
+        }
+
+        // Rising Golden Champage Sparks
+        bgGoldOrbs.forEach((p) => {
+          p.x += p.vx + Math.sin(bgAnimPhase + p.y * 0.01) * 0.35;
+          p.y += p.vy;
+          if (p.y < -20) {
+            p.y = h + 20;
+            p.x = Math.random() * w;
+          }
+          const c = p.hue === 'gold' ? [251, 191, 36] : [251, 113, 133];
+          const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 3.5);
+          g.addColorStop(0, `rgba(255, 255, 255, ${p.alpha})`);
+          g.addColorStop(0.4, `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${p.alpha * 0.7})`);
+          g.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = g;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r * 3.5, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        ctx.globalCompositeOperation = 'source-over';
+      }
+
+      // =====================================================================
+      // SCENE 4: ROTATING SPIRAL GALAXY VORTEX, NEBULA CORE & BLAZING METEORS
+      // =====================================================================
+      else if (bgSceneMode === 'galaxy') {
+        const spaceGrad = ctx.createRadialGradient(w * 0.5, h * 0.5, 10, w * 0.5, h * 0.5, Math.max(w, h) * 0.75);
+        spaceGrad.addColorStop(0, '#1e1035');
+        spaceGrad.addColorStop(0.35, '#0b0726');
+        spaceGrad.addColorStop(0.75, '#040312');
+        spaceGrad.addColorStop(1, '#010108');
+        ctx.fillStyle = spaceGrad;
+        ctx.fillRect(0, 0, w, h);
+
+        ctx.globalCompositeOperation = 'screen';
+
+        const cx = w * 0.5;
+        const cy = h * 0.5;
+
+        // Glowing Galactic Core Supernova
+        const coreGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(w, h) * 0.32);
+        coreGrad.addColorStop(0, 'rgba(255, 240, 200, 0.55)');
+        coreGrad.addColorStop(0.25, 'rgba(192, 132, 252, 0.30)');
+        coreGrad.addColorStop(0.6, 'rgba(56, 189, 248, 0.12)');
+        coreGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = coreGrad;
+        ctx.beginPath();
+        ctx.arc(cx, cy, Math.min(w, h) * 0.32, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Rotating Spiral Arms (Tilted 3D Elliptical Projection)
+        bgSpiralStars.forEach((st) => {
+          st.angle += st.speed;
+          st.twinkle += 0.04;
+          const sx = cx + Math.cos(st.angle) * st.radius * 1.25;
+          const sy = cy + Math.sin(st.angle) * st.radius * 0.68;
+          const al = 0.45 + Math.sin(st.twinkle) * 0.4;
+          ctx.fillStyle = `rgba(${st.col[0]}, ${st.col[1]}, ${st.col[2]}, ${al})`;
+          ctx.beginPath();
+          ctx.arc(sx, sy, st.size, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // Blazing Meteors Streaking Across the Cosmos
+        bgMeteors.forEach((m) => {
+          m.x -= m.speed * 1.45;
+          m.y += m.speed * 0.72;
+          if (m.x < -300 || m.y > h + 300) {
+            m.x = Math.random() * w * 1.4 + w * 0.2;
+            m.y = -80 - Math.random() * 250;
+          }
+          const tailX = m.x + m.len;
+          const tailY = m.y - m.len * 0.5;
+          const mg = ctx.createLinearGradient(m.x, m.y, tailX, tailY);
+          mg.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+          mg.addColorStop(0.3, `rgba(${c2[0]}, ${c2[1]}, ${c2[2]}, 0.75)`);
+          mg.addColorStop(1, 'rgba(255, 255, 255, 0)');
+          ctx.strokeStyle = mg;
+          ctx.lineWidth = m.thickness;
+          ctx.beginPath();
+          ctx.moveTo(m.x, m.y);
+          ctx.lineTo(tailX, tailY);
+          ctx.stroke();
+
+          // Glowing Meteor Head
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(m.x, m.y, m.thickness * 1.2, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        ctx.globalCompositeOperation = 'source-over';
+      }
+
+      // =====================================================================
+      // SCENE 5: SWISS HAUTE HORLOGERIE MECHANICAL TOURBILLON & ASTROLABE
+      // =====================================================================
+      else {
+        const royalGrad = ctx.createRadialGradient(w * 0.5, h * 0.5, 20, w * 0.5, h * 0.5, Math.max(w, h) * 0.8);
+        royalGrad.addColorStop(0, '#141109');
+        royalGrad.addColorStop(0.55, '#090806');
+        royalGrad.addColorStop(1, '#020203');
+        ctx.fillStyle = royalGrad;
+        ctx.fillRect(0, 0, w, h);
+
+        // Subtle Guilloché Luxury Watch Dial Radial Lines
+        const cx = w * 0.5;
+        const cy = h * 0.5;
+        ctx.strokeStyle = 'rgba(212, 175, 55, 0.055)';
+        ctx.lineWidth = 1;
+        for (let a = 0; a < 72; a++) {
+          const ang = (a / 72) * Math.PI * 2 + bgAnimPhase * 0.03;
+          ctx.beginPath();
+          ctx.moveTo(cx + Math.cos(ang) * 60, cy + Math.sin(ang) * 60);
+          ctx.lineTo(cx + Math.cos(ang) * Math.max(w, h) * 0.65, cy + Math.sin(ang) * Math.max(w, h) * 0.65);
+          ctx.stroke();
+        }
+
+        // Rotate and Render Interlocking Swiss Mechanical Gears
+        bgGears.forEach((g) => {
+          g.angle += g.speed;
+          drawMechanicalGear(
+            ctx,
+            w * g.cxRatio,
+            h * g.cyRatio,
+            g.r,
+            g.teeth,
+            g.angle,
+            g.color,
+            g.alpha,
+            g.spokes
+          );
+        });
+
+        // Outer Celestial Astrolabe Degree Ring
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(-bgAnimPhase * 0.08);
+        const astroR = Math.min(w, h) * 0.44;
+        ctx.strokeStyle = 'rgba(212, 175, 55, 0.32)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(0, 0, astroR, 0, Math.PI * 2);
+        ctx.stroke();
+
+        for (let t = 0; t < 60; t++) {
+          const ta = (t / 60) * Math.PI * 2;
+          const tickLen = t % 5 === 0 ? 12 : 5;
+          ctx.beginPath();
+          ctx.moveTo(Math.cos(ta) * (astroR - tickLen), Math.sin(ta) * (astroR - tickLen));
+          ctx.lineTo(Math.cos(ta) * astroR, Math.sin(ta) * astroR);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      // Subtle contrast vignette so UI icons and typography always pop with 100% clarity
+      ctx.globalCompositeOperation = 'source-over';
+      const veilGrad = ctx.createRadialGradient(w * 0.5, h * 0.5, Math.min(w, h) * 0.15, w * 0.5, h * 0.5, Math.max(w, h) * 0.75);
+      veilGrad.addColorStop(0, 'rgba(2, 5, 14, 0.28)');
+      veilGrad.addColorStop(1, 'rgba(2, 5, 14, 0.12)');
+      ctx.fillStyle = veilGrad;
+      ctx.fillRect(0, 0, w, h);
+
+      requestAnimationFrame(renderAnimatedBackgroundFrame);
+    }
+
+    function resizeBgCanvas() {
+      const canvas = document.getElementById('bgAnimatedCanvas');
+      if (!canvas) return;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      initAnimatedBackgroundObjects();
+    }
+
+    // =========================================================================
+    // CORE TIMER, DISTINCT RINGTONES & ARABIC MOTIVATIONAL VOICE STUDIO
+    // =========================================================================
+    const CIRCUMFERENCE = 2 * Math.PI * 134;
+
+    const SVG_PLAY = '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>';
+    const SVG_PAUSE = '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"></rect><rect x="14" y="4" width="4" height="16" rx="1"></rect></svg>';
+
+    let currentMainView = 'timer';
+
+    let mainTimer = {
+      title: 'مؤقت 500 د',
+      totalDurationMs: 500 * 60 * 1000,
+      remainingMs: 500 * 60 * 1000,
+      targetEndTime: null,
+      isRunning: false,
+      preAlertFired: false,
+      displayFormat: 'minutes'
+    };
+
+    let parallelTimers = [
+      {
+        id: 'pt-1',
+        title: 'مؤقت 300 د',
+        totalMs: 300 * 60 * 1000,
+        remainingMs: 300 * 60 * 1000,
+        targetEndTime: null,
+        isRunning: false
+      },
+      {
+        id: 'pt-2',
+        title: 'مؤقت 45 د',
+        totalMs: 45 * 60 * 1000,
+        remainingMs: 45 * 60 * 1000,
+        targetEndTime: null,
+        isRunning: false
+      }
+    ];
+
+    let audioCtx = null;
+    let masterBus = null;
+    let alarmLoopInterval = null;
+    let isTestingSound = false;
+    let overtimeInterval = null;
+    let alarmTriggeredAt = null;
+    let customAudioUrl = null;
+    let customAudioPlayer = null;
+    let activeScheduledOscillators = [];
+
+    function ensureAudioContext() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          audioCtx = new AudioContextClass();
+
+          const compressor = audioCtx.createDynamicsCompressor();
+          compressor.threshold.setValueAtTime(-14, audioCtx.currentTime);
+          compressor.knee.setValueAtTime(20, audioCtx.currentTime);
+          compressor.ratio.setValueAtTime(4, audioCtx.currentTime);
+
+          const dryGain = audioCtx.createGain();
+          dryGain.gain.value = 0.88;
+
+          const delayL = audioCtx.createDelay(1.0);
+          const delayR = audioCtx.createDelay(1.0);
+          delayL.delayTime.value = 0.19;
+          delayR.delayTime.value = 0.29;
+
+          const feedbackGain = audioCtx.createGain();
+          feedbackGain.gain.value = 0.30;
+
+          const reverbFilter = audioCtx.createBiquadFilter();
+          reverbFilter.type = 'lowpass';
+          reverbFilter.frequency.value = 2100;
+
+          const wetGain = audioCtx.createGain();
+          wetGain.gain.value = 0.34;
+
+          const inputNode = audioCtx.createGain();
+          inputNode.connect(dryGain);
+          dryGain.connect(compressor);
+
+          inputNode.connect(delayL);
+          delayL.connect(reverbFilter);
+          reverbFilter.connect(delayR);
+          delayR.connect(feedbackGain);
+          feedbackGain.connect(delayL);
+          reverbFilter.connect(wetGain);
+          wetGain.connect(compressor);
+
+          compressor.connect(audioCtx.destination);
+          masterBus = inputNode;
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function clearScheduledNodes() {
+      activeScheduledOscillators.forEach((node) => {
+        try {
+          node.stop();
+          node.disconnect();
+        } catch (e) {}
+      });
+      activeScheduledOscillators = [];
+
+    }
+
+    // Helper: Synthesize Percussion Drum / Kick / Snare Hit
+    function playPercussionHit(startTime, type, vol) {
+      const ctx = ensureAudioContext();
+      if (!ctx || !masterBus) return;
+
+      if (type === 'kick') {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(135, startTime);
+        osc.frequency.exponentialRampToValueAtTime(36, startTime + 0.22);
+        gain.gain.setValueAtTime(vol * 1.3, startTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.28);
+        osc.connect(gain);
+        gain.connect(masterBus);
+        osc.start(startTime);
+        osc.stop(startTime + 0.3);
+        activeScheduledOscillators.push(osc);
+      } else if (type === 'tom') {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(190, startTime);
+        osc.frequency.exponentialRampToValueAtTime(65, startTime + 0.18);
+        gain.gain.setValueAtTime(vol * 0.95, startTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.22);
+        osc.connect(gain);
+        gain.connect(masterBus);
+        osc.start(startTime);
+        osc.stop(startTime + 0.24);
+        activeScheduledOscillators.push(osc);
+      }
+    }
+
+    // Distinct Instrument Synthesis Engine (Each instrument uses completely different physics & synthesis!)
+    function triggerDistinctInstrumentNote(freq, startTime, duration, volume, instrument) {
+      const ctx = ensureAudioContext();
+      if (!ctx || !masterBus) return;
+
+      const noteGain = ctx.createGain();
+      const filter = ctx.createBiquadFilter();
+
+      // 1. GRAND ROYAL PIANO + WARM STRINGS PAD
+      if (instrument === 'piano') {
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(freq * 6.5, startTime);
+        filter.frequency.exponentialRampToValueAtTime(freq * 1.4, startTime + duration);
+
+        noteGain.gain.setValueAtTime(0.0001, startTime);
+        noteGain.gain.linearRampToValueAtTime(volume, startTime + 0.012);
+        noteGain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+        filter.connect(noteGain);
+        noteGain.connect(masterBus);
+
+        [
+          { mult: 1, amp: 1.0, type: 'triangle', detune: 0 },
+          { mult: 2, amp: 0.42, type: 'sine', detune: 4 },
+          { mult: 3, amp: 0.15, type: 'sine', detune: -4 },
+          { mult: 0.5, amp: 0.35, type: 'sine', detune: 0 }
+        ].forEach((p) => {
+          const osc = ctx.createOscillator();
+          const pg = ctx.createGain();
+          osc.type = p.type;
+          osc.frequency.setValueAtTime(freq * p.mult, startTime);
+          osc.detune.setValueAtTime(p.detune, startTime);
+          pg.gain.value = p.amp;
+          osc.connect(pg);
+          pg.connect(filter);
+          osc.start(startTime);
+          osc.stop(startTime + duration + 0.04);
+          activeScheduledOscillators.push(osc);
+        });
+      }
+
+      // 2. ARABIC OUD & HARP (PLUCKED SAWTOOTH + RESONANT BODY + VIBRATO)
+      else if (instrument === 'oud') {
+        filter.type = 'bandpass';
+        filter.Q.value = 2.4;
+        filter.frequency.setValueAtTime(freq * 3.2, startTime);
+        filter.frequency.exponentialRampToValueAtTime(freq * 1.1, startTime + duration * 0.8);
+
+        noteGain.gain.setValueAtTime(0.0001, startTime);
+        noteGain.gain.linearRampToValueAtTime(volume * 1.35, startTime + 0.006);
+        noteGain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+        filter.connect(noteGain);
+        noteGain.connect(masterBus);
+
+        [
+          { mult: 1, amp: 1.0, type: 'sawtooth', detune: 0 },
+          { mult: 1, amp: 0.65, type: 'sawtooth', detune: 9 },
+          { mult: 2, amp: 0.3, type: 'triangle', detune: -5 }
+        ].forEach((p) => {
+          const osc = ctx.createOscillator();
+          const pg = ctx.createGain();
+          osc.type = p.type;
+          osc.frequency.setValueAtTime(freq * p.mult * 0.985, startTime);
+          osc.frequency.exponentialRampToValueAtTime(freq * p.mult, startTime + 0.035);
+          osc.detune.setValueAtTime(p.detune, startTime);
+          pg.gain.value = p.amp;
+          osc.connect(pg);
+          pg.connect(filter);
+          osc.start(startTime);
+          osc.stop(startTime + duration + 0.04);
+          activeScheduledOscillators.push(osc);
+        });
+      }
+
+      // 3. AFRICAN WOOD MARIMBA (HOLLOW RESONATOR + 4TH HARMONIC OVERDRIVE)
+      else if (instrument === 'marimba') {
+        noteGain.gain.setValueAtTime(0.0001, startTime);
+        noteGain.gain.linearRampToValueAtTime(volume * 1.3, startTime + 0.005);
+        noteGain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+        noteGain.connect(masterBus);
+
+        // Fundamental hollow wood tone + fast-decaying 4x harmonic mallet strike
+        const osc1 = ctx.createOscillator();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(freq, startTime);
+        osc1.connect(noteGain);
+        osc1.start(startTime);
+        osc1.stop(startTime + duration + 0.02);
+        activeScheduledOscillators.push(osc1);
+
+        const osc2 = ctx.createOscillator();
+        const g2 = ctx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(freq * 3.98, startTime);
+        g2.gain.setValueAtTime(volume * 0.65, startTime);
+        g2.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.075);
+        osc2.connect(g2);
+        g2.connect(masterBus);
+        osc2.start(startTime);
+        osc2.stop(startTime + 0.09);
+        activeScheduledOscillators.push(osc2);
+      }
+
+      // 4. CATHEDRAL BRONZE BELLS (TRUE FM SYNTHESIS WITH INHARMONIC METALLIC RATIOS)
+      else if (instrument === 'bell') {
+        const carrier = ctx.createOscillator();
+        const modulator = ctx.createOscillator();
+        const modGain = ctx.createGain();
+
+        carrier.type = 'sine';
+        modulator.type = 'sine';
+        carrier.frequency.setValueAtTime(freq, startTime);
+        modulator.frequency.setValueAtTime(freq * 2.414, startTime); // Metallic bell ratio
+
+        modGain.gain.setValueAtTime(freq * 1.8, startTime);
+        modGain.gain.exponentialRampToValueAtTime(1, startTime + duration * 0.9);
+
+        noteGain.gain.setValueAtTime(0.0001, startTime);
+        noteGain.gain.linearRampToValueAtTime(volume * 1.15, startTime + 0.008);
+        noteGain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+        modulator.connect(modGain);
+        modGain.connect(carrier.frequency);
+        carrier.connect(noteGain);
+        noteGain.connect(masterBus);
+
+        // Sub-hum of giant bronze bell
+        const subOsc = ctx.createOscillator();
+        const subG = ctx.createGain();
+        subOsc.type = 'sine';
+        subOsc.frequency.setValueAtTime(freq * 0.5, startTime);
+        subG.gain.setValueAtTime(volume * 0.45, startTime);
+        subG.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+        subOsc.connect(subG);
+        subG.connect(masterBus);
+
+        modulator.start(startTime);
+        carrier.start(startTime);
+        subOsc.start(startTime);
+        modulator.stop(startTime + duration + 0.05);
+        carrier.stop(startTime + duration + 0.05);
+        subOsc.stop(startTime + duration + 0.05);
+        activeScheduledOscillators.push(modulator, carrier, subOsc);
+      }
+
+      // 5. SHARP DIGITAL QUARTZ ALARM (SQUARE WAVE ELECTRONIC BEEP-BEEP-BEEP)
+      else if (instrument === 'digital_beep') {
+        const osc = ctx.createOscillator();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(freq, startTime);
+
+        filter.type = 'lowpass';
+        filter.frequency.value = 4800;
+
+        noteGain.gain.setValueAtTime(0.0001, startTime);
+        noteGain.gain.linearRampToValueAtTime(volume * 0.75, startTime + 0.003);
+        noteGain.gain.setValueAtTime(volume * 0.75, startTime + duration - 0.008);
+        noteGain.gain.linearRampToValueAtTime(0.0001, startTime + duration);
+
+        osc.connect(filter);
+        filter.connect(noteGain);
+        noteGain.connect(masterBus);
+        osc.start(startTime);
+        osc.stop(startTime + duration + 0.01);
+        activeScheduledOscillators.push(osc);
+      }
+
+      // 6. CYBERPUNK SYNTHWAVE ARPEGGIATOR + FAT ANALOG SAW LEAD
+      else if (instrument === 'cyber_synth') {
+        filter.type = 'lowpass';
+        filter.Q.value = 4.5;
+        filter.frequency.setValueAtTime(320, startTime);
+        filter.frequency.exponentialRampToValueAtTime(4200, startTime + duration * 0.4);
+        filter.frequency.exponentialRampToValueAtTime(600, startTime + duration);
+
+        noteGain.gain.setValueAtTime(0.0001, startTime);
+        noteGain.gain.linearRampToValueAtTime(volume * 0.95, startTime + 0.015);
+        noteGain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+        filter.connect(noteGain);
+        noteGain.connect(masterBus);
+
+        [-12, 0, 12].forEach((det) => {
+          const osc = ctx.createOscillator();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(freq, startTime);
+          osc.detune.setValueAtTime(det, startTime);
+          osc.connect(filter);
+          osc.start(startTime);
+          osc.stop(startTime + duration + 0.03);
+          activeScheduledOscillators.push(osc);
+        });
+      }
+
+      // 7. CINEMATIC HEROIC BRASS / ORCHESTRAL HORN (FOR ARABIC MOTIVATIONAL BACKING)
+      else if (instrument === 'heroic_brass') {
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(450, startTime);
+        filter.frequency.linearRampToValueAtTime(2800, startTime + 0.18);
+        filter.frequency.exponentialRampToValueAtTime(900, startTime + duration);
+
+        noteGain.gain.setValueAtTime(0.0001, startTime);
+        noteGain.gain.linearRampToValueAtTime(volume * 0.85, startTime + 0.08);
+        noteGain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+        filter.connect(noteGain);
+        noteGain.connect(masterBus);
+
+        [
+          { mult: 1, det: -8, type: 'sawtooth' },
+          { mult: 1, det: 8, type: 'sawtooth' },
+          { mult: 0.5, det: 0, type: 'triangle' }
+        ].forEach((p) => {
+          const osc = ctx.createOscillator();
+          osc.type = p.type;
+          osc.frequency.setValueAtTime(freq * p.mult, startTime);
+          osc.detune.setValueAtTime(p.detune || p.det, startTime);
+          osc.connect(filter);
+          osc.start(startTime);
+          osc.stop(startTime + duration + 0.05);
+          activeScheduledOscillators.push(osc);
+        });
+      }
+    }
+
+    function playSynthesizedToneBurst(toneName) {
+      clearScheduledNodes();
+
+      const volumeSlider = document.getElementById('volumeSlider');
+      const rawSlider = volumeSlider ? Number(volumeSlider.value) : 85;
+      const vol = (rawSlider / 100) * 0.34;
+
+      if (toneName === 'custom' && customAudioUrl) {
+        if (!customAudioPlayer) {
+          customAudioPlayer = new Audio(customAudioUrl);
+        }
+        customAudioPlayer.volume = Math.min(1, rawSlider / 100);
+        customAudioPlayer.currentTime = 0;
+        customAudioPlayer.play().catch(() => {});
+        return;
+      }
+
+      const ctx = ensureAudioContext();
+      if (!ctx) return;
+      const now = ctx.currentTime + 0.02;
+
+      // =====================================================================
+      // B. 6 RADICALLY DISTINCT INSTRUMENTAL & DIGITAL RINGTONES
+      // =====================================================================
+
+      // 1. PIANO: Royal Classical Arpeggio & Warm Bass Chords
+      if (toneName === 'piano') {
+        const score = [
+          { f: 130.81, t: 0.00, d: 2.5, v: vol * 0.85 },
+          { f: 261.63, t: 0.00, d: 1.4, v: vol },
+          { f: 329.63, t: 0.25, d: 1.4, v: vol },
+          { f: 392.00, t: 0.50, d: 1.4, v: vol },
+          { f: 523.25, t: 0.75, d: 1.8, v: vol * 1.1 },
+          { f: 174.61, t: 1.50, d: 2.2, v: vol * 0.85 },
+          { f: 659.25, t: 1.50, d: 1.2, v: vol * 1.1 },
+          { f: 587.33, t: 1.85, d: 1.2, v: vol },
+          { f: 523.25, t: 2.20, d: 1.8, v: vol * 1.15 }
+        ];
+        score.forEach((n) => triggerDistinctInstrumentNote(n.f, now + n.t, n.d, n.v, 'piano'));
+      }
+
+      // 2. HARP / OUD: Authentic Oriental Maqam Hijaz Plucked Oud & Percussion
+      else if (toneName === 'harp') {
+        // D Hijaz scale: D4 (293.66), Eb4 (311.13), F#4 (369.99), G4 (392.00), A4 (440.00), Bb4 (466.16), C#5 (554.37), D5 (587.33)
+        const oudMelody = [
+          { f: 293.66, t: 0.00, d: 0.55 },
+          { f: 311.13, t: 0.22, d: 0.55 },
+          { f: 369.99, t: 0.44, d: 0.65 },
+          { f: 392.00, t: 0.72, d: 0.75 },
+          { f: 440.00, t: 1.05, d: 0.55 },
+          { f: 466.16, t: 1.30, d: 0.55 },
+          { f: 554.37, t: 1.55, d: 0.65 },
+          { f: 587.33, t: 1.85, d: 1.10 },
+          { f: 440.00, t: 2.35, d: 0.70 },
+          { f: 369.99, t: 2.65, d: 1.20 }
+        ];
+        oudMelody.forEach((n) => triggerDistinctInstrumentNote(n.f, now + n.t, n.d, vol, 'oud'));
+        [0, 0.72, 1.05, 1.85, 2.35].forEach((dt, idx) =>
+          playPercussionHit(now + dt, idx % 2 === 0 ? 'kick' : 'tom', vol * 0.7)
+        );
+      }
+
+      // 3. KALIMBA / MARIMBA: Fast Syncopated Tropical Wood Mallet Groove + Kick Bass
+      else if (toneName === 'kalimba') {
+        const groove = [
+          { f: 523.25, t: 0.00 },
+          { f: 392.00, t: 0.16 },
+          { f: 659.25, t: 0.32 },
+          { f: 523.25, t: 0.48 },
+          { f: 783.99, t: 0.64 },
+          { f: 659.25, t: 0.96 },
+          { f: 523.25, t: 1.12 },
+          { f: 880.00, t: 1.28 },
+          { f: 783.99, t: 1.60 },
+          { f: 659.25, t: 1.76 },
+          { f: 523.25, t: 1.92 },
+          { f: 1046.50, t: 2.24 },
+          { f: 783.99, t: 2.56 }
+        ];
+        groove.forEach((n) => triggerDistinctInstrumentNote(n.f, now + n.t, 0.32, vol, 'marimba'));
+        [0, 0.64, 1.28, 1.92, 2.56].forEach((dt) => playPercussionHit(now + dt, 'kick', vol * 0.85));
+        [0.32, 0.96, 1.60, 2.24].forEach((dt) => playPercussionHit(now + dt, 'tom', vol * 0.75));
+      }
+
+      // 4. CHIMES: Westminster Royal Cathedral Big Ben Metallic Bronze Bells
+      else if (toneName === 'chimes') {
+        const bells = [
+          { f: 329.63, t: 0.00, d: 2.2 }, // E4
+          { f: 293.66, t: 0.65, d: 2.2 }, // D4
+          { f: 261.63, t: 1.30, d: 2.2 }, // C4
+          { f: 196.00, t: 1.95, d: 2.8 }, // G3
+          { f: 130.81, t: 2.75, d: 3.2 }  // Deep C3 Big Strike
+        ];
+        bells.forEach((n) => triggerDistinctInstrumentNote(n.f, now + n.t, n.d, vol, 'bell'));
+      }
+
+      // 5. QUARTZ: Classic High-Precision Sharp Digital Watch Beep-Beep-Beep-Beep!
+      else if (toneName === 'quartz') {
+        const bursts = [0.0, 0.95, 1.90];
+        bursts.forEach((bStart, bIdx) => {
+          const pitch = bIdx === 2 ? 3135.96 : 2637.02; // High E7 / G7 crisp Casio beep
+          for (let i = 0; i < 4; i++) {
+            triggerDistinctInstrumentNote(pitch, now + bStart + i * 0.11, 0.065, vol, 'digital_beep');
+          }
+        });
+      }
+
+      // 6. CYBER: Futuristic Synthwave Laser Arpeggio + Sub Bass
+      else if (toneName === 'cyber') {
+        const arp = [220, 261.63, 329.63, 440, 329.63, 440, 523.25, 659.25, 880, 659.25, 523.25, 440];
+        arp.forEach((f, idx) => {
+          triggerDistinctInstrumentNote(f, now + idx * 0.22, 0.35, vol, 'cyber_synth');
+          if (idx % 4 === 0) playPercussionHit(now + idx * 0.22, 'kick', vol);
+        });
+      }
+    }
+
+    function handleCustomAudioUpload(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      if (customAudioUrl) URL.revokeObjectURL(customAudioUrl);
+      customAudioUrl = URL.createObjectURL(file);
+      customAudioPlayer = new Audio(customAudioUrl);
+
+      const selectEl = document.getElementById('alarmToneSelect');
+      if (selectEl) {
+        let existingOpt = selectEl.querySelector('option[value="custom"]');
+        if (!existingOpt) {
+          existingOpt = document.createElement('option');
+          existingOpt.value = 'custom';
+          selectEl.prepend(existingOpt);
+        }
+        existingOpt.textContent = `🎵 ملفي الصوتي: ${file.name.slice(0, 22)}`;
+        selectEl.value = 'custom';
+      }
+
+      const labelEl = document.getElementById('customAudioLabel');
+      if (labelEl) labelEl.textContent = `تم اختيار: ${file.name.slice(0, 25)}`;
+      handleToneChange();
+      showLuxuryToast('تم تفعيل النغمة الخاصة بنجاح');
+    }
+
+    function startContinuousAlarmAudio() {
+      stopContinuousAlarmAudio();
+      const selectEl = document.getElementById('alarmToneSelect');
+      const tone = selectEl ? selectEl.value : 'piano';
+      const eq = document.getElementById('soundEqIndicator');
+      if (eq) eq.classList.add('eq-active');
+
+      const loopMs = 3600;
+      playSynthesizedToneBurst(tone);
+      alarmLoopInterval = setInterval(() => {
+        const currentTone = selectEl ? selectEl.value : 'piano';
+        playSynthesizedToneBurst(currentTone);
+      }, loopMs);
+    }
+
+    function stopContinuousAlarmAudio() {
+      if (alarmLoopInterval) {
+        clearInterval(alarmLoopInterval);
+        alarmLoopInterval = null;
+      }
+      clearScheduledNodes();
+      if (customAudioPlayer) {
+        customAudioPlayer.pause();
+        customAudioPlayer.currentTime = 0;
+      }
+      isTestingSound = false;
+      const btnText = document.getElementById('testSoundBtnText');
+      if (btnText) btnText.textContent = 'معاينة';
+      const eq = document.getElementById('soundEqIndicator');
+      if (eq) eq.classList.remove('eq-active');
+    }
+
+    function toggleTestAlarmSound() {
+      if (isTestingSound) {
+        stopContinuousAlarmAudio();
+      } else {
+        isTestingSound = true;
+        const btnText = document.getElementById('testSoundBtnText');
+        if (btnText) btnText.textContent = 'إيقاف';
+        startContinuousAlarmAudio();
+        setTimeout(() => {
+          if (isTestingSound) stopContinuousAlarmAudio();
+        }, 7200);
+      }
+    }
+
+    function handleToneChange() {
+      const selectEl = document.getElementById('alarmToneSelect');
+      const val = selectEl ? selectEl.value : 'piano';
+      if (isTestingSound) {
+        startContinuousAlarmAudio();
+      } else {
+        playSynthesizedToneBurst(val);
+      }
+    }
+
+    function updateVolumeLabel() {
+      const slider = document.getElementById('volumeSlider');
+      const label = document.getElementById('volumeValueLabel');
+      if (slider && label) {
+        label.textContent = slider.value + '%';
+      }
+      if (customAudioPlayer && slider) {
+        customAudioPlayer.volume = Number(slider.value) / 100;
+      }
+    }
+
+    // =========================================================================
+    // INFINITE DAILY STATISTICS & ANALYTICS ENGINE
+    // =========================================================================
+    let dailyStatsLog = {};
+    let statsChartRangeDays = 14;
+    let dailyBarChartInstance = null;
+    let comparisonChartInstance = null;
+
+    function getLocalDateKey(dateObj) {
+      const d = dateObj || new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+
+    function getOffsetDateKey(daysOffset) {
+      const d = new Date();
+      d.setDate(d.getDate() + daysOffset);
+      return getLocalDateKey(d);
+    }
+
+    function initDefaultStatsHistoryIfEmpty() {
+      try {
+        const saved = localStorage.getItem('chronolux_daily_stats_v1');
+        if (saved) {
+          dailyStatsLog = JSON.parse(saved) || {};
+          return;
+        }
+      } catch (e) {}
+
+      const sampleMinutes = [
+        { offset: 0, mins: 185, sessions: 1 },
+        { offset: -1, mins: 500, sessions: 2 },
+        { offset: -2, mins: 320, sessions: 2 },
+        { offset: -3, mins: 450, sessions: 1 },
+        { offset: -4, mins: 240, sessions: 2 },
+        { offset: -5, mins: 300, sessions: 1 },
+        { offset: -6, mins: 390, sessions: 2 },
+        { offset: -7, mins: 520, sessions: 2 },
+        { offset: -8, mins: 280, sessions: 1 },
+        { offset: -9, mins: 410, sessions: 2 },
+        { offset: -10, mins: 360, sessions: 1 },
+        { offset: -11, mins: 480, sessions: 2 },
+        { offset: -12, mins: 300, sessions: 1 },
+        { offset: -13, mins: 550, sessions: 2 }
+      ];
+
+      sampleMinutes.forEach((item) => {
+        const key = getOffsetDateKey(item.offset);
+        dailyStatsLog[key] = {
+          totalSeconds: item.mins * 60,
+          sessions: item.sessions
+        };
+      });
+      saveDailyStatsToStorage();
+    }
+
+    function saveDailyStatsToStorage() {
+      try {
+        localStorage.setItem('chronolux_daily_stats_v1', JSON.stringify(dailyStatsLog));
+      } catch (e) {}
+    }
+
+    function recordActiveSecondsToday(secondsDelta, completedSessionIncrement) {
+      const todayKey = getLocalDateKey(new Date());
+      if (!dailyStatsLog[todayKey]) {
+        dailyStatsLog[todayKey] = { totalSeconds: 0, sessions: 0 };
+      }
+      dailyStatsLog[todayKey].totalSeconds = Math.max(0, (dailyStatsLog[todayKey].totalSeconds || 0) + secondsDelta);
+      if (completedSessionIncrement) {
+        dailyStatsLog[todayKey].sessions = (dailyStatsLog[todayKey].sessions || 0) + completedSessionIncrement;
+      }
+      saveDailyStatsToStorage();
+      if (currentMainView === 'stats') {
+        refreshAllStatisticsUI();
+      }
+    }
+
+    function formatArabicDayAndDate(dateKey) {
+      const todayKey = getLocalDateKey(new Date());
+      const yesterdayKey = getOffsetDateKey(-1);
+      const parts = dateKey.split('-');
+      if (parts.length !== 3) return dateKey;
+      const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+      const dayNames = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+      const dayName = dayNames[d.getDay()] || '';
+      if (dateKey === todayKey) return `اليوم (${dayName}) — ${dateKey}`;
+      if (dateKey === yesterdayKey) return `أمس (${dayName}) — ${dateKey}`;
+      return `${dayName} — ${dateKey}`;
+    }
+
+    function formatHoursAndMinutesText(totalSeconds) {
+      const totalMinutes = Math.round(totalSeconds / 60);
+      const hrs = Math.floor(totalMinutes / 60);
+      const mins = totalMinutes % 60;
+      if (hrs === 0) return `${mins} د`;
+      if (mins === 0) return `${hrs} س`;
+      return `${hrs} س و ${mins} د`;
+    }
+
+    function switchMainView(viewName) {
+      currentMainView = viewName;
+      const timerView = document.getElementById('viewTimerWorkspace');
+      const statsView = document.getElementById('viewStatsWorkspace');
+      const btnTimer = document.getElementById('navTabTimerBtn');
+      const btnStats = document.getElementById('navTabStatsBtn');
+
+      if (viewName === 'stats') {
+        if (timerView) timerView.classList.add('hidden');
+        if (statsView) {
+          statsView.classList.remove('hidden');
+          statsView.classList.add('flex');
+        }
+        if (btnStats) btnStats.className = 'px-4 py-1.5 rounded-lg lux-btn-primary text-slate-950 text-xs font-semibold flex items-center gap-2 transition cursor-pointer';
+        if (btnTimer) btnTimer.className = 'px-4 py-1.5 rounded-lg text-slate-300 hover:text-white text-xs font-normal flex items-center gap-2 transition cursor-pointer';
+        refreshAllStatisticsUI();
+      } else {
+        if (statsView) {
+          statsView.classList.add('hidden');
+          statsView.classList.remove('flex');
+        }
+        if (timerView) timerView.classList.remove('hidden');
+        if (btnTimer) btnTimer.className = 'px-4 py-1.5 rounded-lg lux-btn-primary text-slate-950 text-xs font-semibold flex items-center gap-2 transition cursor-pointer';
+        if (btnStats) btnStats.className = 'px-4 py-1.5 rounded-lg text-slate-300 hover:text-white text-xs font-normal flex items-center gap-2 transition cursor-pointer';
+      }
+    }
+
+    function setStatsChartRange(days) {
+      statsChartRangeDays = days;
+      const b7 = document.getElementById('chartRange7Btn');
+      const b14 = document.getElementById('chartRange14Btn');
+      const bAll = document.getElementById('chartRangeAllBtn');
+      const activeCls = 'px-3 py-1 rounded-lg lux-btn-primary text-slate-950 font-medium transition cursor-pointer';
+      const idleCls = 'px-3 py-1 rounded-lg text-slate-300 hover:text-white font-light transition cursor-pointer';
+      if (b7) b7.className = days === 7 ? activeCls : idleCls;
+      if (b14) b14.className = days === 14 ? activeCls : idleCls;
+      if (bAll) bAll.className = days === 0 ? activeCls : idleCls;
+      renderStatsCharts();
+    }
+
+    function refreshAllStatisticsUI() {
+      const todayKey = getLocalDateKey(new Date());
+      const yesterdayKey = getOffsetDateKey(-1);
+
+      const todaySec = (dailyStatsLog[todayKey] && dailyStatsLog[todayKey].totalSeconds) || 0;
+      const yestSec = (dailyStatsLog[yesterdayKey] && dailyStatsLog[yesterdayKey].totalSeconds) || 0;
+
+      let weekSec = 0;
+      for (let i = 0; i < 7; i++) {
+        const k = getOffsetDateKey(-i);
+        if (dailyStatsLog[k]) weekSec += dailyStatsLog[k].totalSeconds || 0;
+      }
+
+      const allKeys = Object.keys(dailyStatsLog).sort();
+      let allTimeSec = 0;
+      allKeys.forEach((k) => {
+        allTimeSec += (dailyStatsLog[k] && dailyStatsLog[k].totalSeconds) || 0;
+      });
+
+      const todayHours = (todaySec / 3600).toFixed(1);
+      const todayMins = Math.round(todaySec / 60);
+      const yestHours = (yestSec / 3600).toFixed(1);
+      const yestMins = Math.round(yestSec / 60);
+      const weekHours = (weekSec / 3600).toFixed(1);
+      const weekMins = Math.round(weekSec / 60);
+      const weekAvgHours = (weekSec / 3600 / 7).toFixed(1);
+      const allHours = (allTimeSec / 3600).toFixed(1);
+      const allMins = Math.round(allTimeSec / 60);
+
+      const elTH = document.getElementById('statCardTodayHours');
+      const elTM = document.getElementById('statCardTodayMinutes');
+      const elTDiff = document.getElementById('statCardTodayDiff');
+      const elYH = document.getElementById('statCardYesterdayHours');
+      const elYM = document.getElementById('statCardYesterdayMinutes');
+      const elWH = document.getElementById('statCardWeekHours');
+      const elWM = document.getElementById('statCardWeekMinutes');
+      const elWAvg = document.getElementById('statCardWeekAvg');
+      const elAH = document.getElementById('statCardAllTimeHours');
+      const elAM = document.getElementById('statCardAllTimeMinutes');
+      const elDaysBadge = document.getElementById('statCardTotalDaysBadge');
+
+      if (elTH) elTH.textContent = `${todayHours} h`;
+      if (elTM) elTM.textContent = `${todayMins} دقيقة (${formatHoursAndMinutesText(todaySec)})`;
+      if (elTDiff) {
+        if (yestSec > 0) {
+          const diffPct = Math.round(((todaySec - yestSec) / yestSec) * 100);
+          elTDiff.textContent = (diffPct >= 0 ? '+' : '') + diffPct + '% عن أمس';
+        } else {
+          elTDiff.textContent = 'يوم جديد';
+        }
+      }
+
+      if (elYH) elYH.textContent = `${yestHours} h`;
+      if (elYM) elYM.textContent = `${yestMins} دقيقة (${formatHoursAndMinutesText(yestSec)})`;
+      if (elWH) elWH.textContent = `${weekHours} h`;
+      if (elWM) elWM.textContent = `${weekMins} دقيقة في 7 أيام`;
+      if (elWAvg) elWAvg.textContent = `المعدل: ${weekAvgHours} س/يوم`;
+      if (elAH) elAH.textContent = `${allHours} h`;
+      if (elAM) elAM.textContent = `${allMins} دقيقة مسجلة`;
+      if (elDaysBadge) elDaysBadge.textContent = `${allKeys.length} يوم`;
+
+      renderStatsCharts();
+      renderInfiniteDailyTable();
+    }
+
+    function renderStatsCharts() {
+      if (typeof Chart === 'undefined') return;
+
+      const accentMain = getComputedStyle(document.documentElement).getPropertyValue('--accent-main').trim() || '#10b981';
+      const accentSec = getComputedStyle(document.documentElement).getPropertyValue('--accent-sec').trim() || '#6ee7b7';
+
+      let keysToPlot = [];
+      if (statsChartRangeDays > 0) {
+        for (let i = statsChartRangeDays - 1; i >= 0; i--) {
+          keysToPlot.push(getOffsetDateKey(-i));
+        }
+      } else {
+        keysToPlot = Object.keys(dailyStatsLog).sort();
+        if (keysToPlot.length === 0) keysToPlot = [getLocalDateKey(new Date())];
+      }
+
+      const labels = keysToPlot.map((k) => {
+        if (k === getLocalDateKey(new Date())) return 'اليوم';
+        if (k === getOffsetDateKey(-1)) return 'أمس';
+        return k.slice(5);
+      });
+
+      const hoursData = keysToPlot.map((k) => {
+        const sec = (dailyStatsLog[k] && dailyStatsLog[k].totalSeconds) || 0;
+        return Number((sec / 3600).toFixed(2));
+      });
+
+      const canvas1 = document.getElementById('dailyHoursChartCanvas');
+      if (canvas1) {
+        if (dailyBarChartInstance) dailyBarChartInstance.destroy();
+        dailyBarChartInstance = new Chart(canvas1.getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels,
+            datasets: [
+              {
+                label: 'عدد الساعات',
+                data: hoursData,
+                backgroundColor: keysToPlot.map((k) =>
+                  k === getLocalDateKey(new Date()) ? accentSec : accentMain + '88'
+                ),
+                borderColor: accentMain,
+                borderWidth: 1,
+                borderRadius: 8,
+                maxBarThickness: 34
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: function(ctx) {
+                    const hrs = ctx.parsed.y || 0;
+                    const mins = Math.round(hrs * 60);
+                    return ` ${hrs} ساعة (${mins} دقيقة)`;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                ticks: { color: '#cbd5e1', font: { family: 'Alexandria', size: 11 } },
+                grid: { display: false }
+              },
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  color: '#cbd5e1',
+                  font: { family: 'Outfit', size: 11 },
+                  callback: function(v) { return v + 'h'; }
+                },
+                grid: { color: 'rgba(255,255,255,0.06)' }
+              }
+            }
+          }
+        });
+      }
+
+      const todaySec = (dailyStatsLog[getLocalDateKey(new Date())] && dailyStatsLog[getLocalDateKey(new Date())].totalSeconds) || 0;
+      const yestSec = (dailyStatsLog[getOffsetDateKey(-1)] && dailyStatsLog[getOffsetDateKey(-1)].totalSeconds) || 0;
+      let weekSec = 0;
+      for (let i = 0; i < 7; i++) {
+        const k = getOffsetDateKey(-i);
+        if (dailyStatsLog[k]) weekSec += dailyStatsLog[k].totalSeconds || 0;
+      }
+      const avgSec = weekSec / 7;
+
+      const canvas2 = document.getElementById('comparisonChartCanvas');
+      if (canvas2) {
+        if (comparisonChartInstance) comparisonChartInstance.destroy();
+        comparisonChartInstance = new Chart(canvas2.getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels: ['اليوم', 'أمس', 'معدل الأسبوع'],
+            datasets: [
+              {
+                label: 'الساعات',
+                data: [
+                  Number((todaySec / 3600).toFixed(2)),
+                  Number((yestSec / 3600).toFixed(2)),
+                  Number((avgSec / 3600).toFixed(2))
+                ],
+                backgroundColor: [accentSec, accentMain + '99', 'rgba(148, 163, 184, 0.45)'],
+                borderRadius: 8,
+                barThickness: 22
+              }
+            ]
+          },
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: function(ctx) {
+                    const hrs = ctx.parsed.x || 0;
+                    return ` ${hrs} ساعة (${Math.round(hrs * 60)} د)`;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                beginAtZero: true,
+                ticks: { color: '#cbd5e1', font: { family: 'Outfit', size: 10 } },
+                grid: { color: 'rgba(255,255,255,0.06)' }
+              },
+              y: {
+                ticks: { color: '#f1f5f9', font: { family: 'Alexandria', size: 11 } },
+                grid: { display: false }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    function renderInfiniteDailyTable() {
+      const tbody = document.getElementById('infiniteDailyTableBody');
+      if (!tbody) return;
+
+      const searchInput = document.getElementById('statsTableSearchInput');
+      const query = (searchInput && searchInput.value ? searchInput.value.trim() : '').toLowerCase();
+
+      const allKeysDesc = Object.keys(dailyStatsLog).sort().reverse();
+      let maxSeconds = 1;
+      allKeysDesc.forEach((k) => {
+        const s = (dailyStatsLog[k] && dailyStatsLog[k].totalSeconds) || 0;
+        if (s > maxSeconds) maxSeconds = s;
+      });
+
+      const filtered = allKeysDesc.filter((dateKey) => {
+        if (!query) return true;
+        const label = formatArabicDayAndDate(dateKey).toLowerCase();
+        return dateKey.includes(query) || label.includes(query);
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="py-8 text-center text-slate-400 font-light">لا توجد سجلات مطابقة</td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((dateKey) => {
+        const rec = dailyStatsLog[dateKey] || { totalSeconds: 0, sessions: 0 };
+        const totalMins = Math.round((rec.totalSeconds || 0) / 60);
+        const decimalHours = ((rec.totalSeconds || 0) / 3600).toFixed(2);
+        const detailedHours = formatHoursAndMinutesText(rec.totalSeconds || 0);
+        const sessions = rec.sessions || 1;
+        const pct = Math.min(100, Math.round(((rec.totalSeconds || 0) / maxSeconds) * 100));
+        const isToday = dateKey === getLocalDateKey(new Date());
+        const rowHighlight = isToday ? 'bg-white/[0.05]' : '';
+
+        return `
+          <tr class="${rowHighlight} hover:bg-white/[0.06] transition">
+            <td class="py-3.5 px-4 font-normal text-white">${formatArabicDayAndDate(dateKey)}</td>
+            <td class="py-3.5 px-4 mono-digits font-medium accent-text" dir="ltr">${totalMins} m</td>
+            <td class="py-3.5 px-4 text-slate-200 font-light">${detailedHours}</td>
+            <td class="py-3.5 px-4 mono-digits text-slate-100" dir="ltr">${decimalHours} h</td>
+            <td class="py-3.5 px-4 mono-digits text-slate-300">${sessions}</td>
+            <td class="py-3.5 px-4">
+              <div class="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+                <div class="h-full accent-bg rounded-full" style="width: ${pct}%"></div>
+              </div>
+            </td>
+            <td class="py-3.5 px-4 text-left">
+              <button type="button" onclick="deleteDayLogRecord('${dateKey}')" class="text-slate-400 hover:text-rose-400 transition p-1 cursor-pointer" title="حذف اليوم">
+                <svg class="w-3.5 h-3.5 inline" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function saveManualDayLog(mode) {
+      const dateInput = document.getElementById('manualLogDateInput');
+      const minsInput = document.getElementById('manualLogMinutesInput');
+      const dateKey = (dateInput && dateInput.value) ? dateInput.value : getLocalDateKey(new Date());
+      const mins = Math.max(1, parseInt(minsInput ? minsInput.value : '60', 10) || 60);
+
+      if (!dailyStatsLog[dateKey]) {
+        dailyStatsLog[dateKey] = { totalSeconds: 0, sessions: 0 };
+      }
+
+      if (mode === 'add') {
+        dailyStatsLog[dateKey].totalSeconds += mins * 60;
+        dailyStatsLog[dateKey].sessions = (dailyStatsLog[dateKey].sessions || 0) + 1;
+        showLuxuryToast(`أضيفت ${mins} دقيقة إلى سجل ${dateKey}`);
+      } else {
+        dailyStatsLog[dateKey].totalSeconds = mins * 60;
+        dailyStatsLog[dateKey].sessions = Math.max(1, dailyStatsLog[dateKey].sessions || 1);
+        showLuxuryToast(`تم تعيين سجل ${dateKey} إلى ${mins} دقيقة`);
+      }
+
+      saveDailyStatsToStorage();
+      refreshAllStatisticsUI();
+    }
+
+    function deleteDayLogRecord(dateKey) {
+      delete dailyStatsLog[dateKey];
+      saveDailyStatsToStorage();
+      refreshAllStatisticsUI();
+      showLuxuryToast(`تم حذف سجل ${dateKey}`);
+    }
+
+    function clearAllStatsHistory() {
+      const todayKey = getLocalDateKey(new Date());
+      dailyStatsLog = {};
+      dailyStatsLog[todayKey] = { totalSeconds: 0, sessions: 0 };
+      saveDailyStatsToStorage();
+      refreshAllStatisticsUI();
+      showLuxuryToast('تم تصفير السجل والبدء من اليوم');
+    }
+
+    function exportDailyStatsCSV() {
+      const keys = Object.keys(dailyStatsLog).sort().reverse();
+      let csv = 'Date,Minutes,Hours,Sessions\n';
+      keys.forEach((k) => {
+        const rec = dailyStatsLog[k] || { totalSeconds: 0, sessions: 0 };
+        const mins = Math.round((rec.totalSeconds || 0) / 60);
+        const hrs = ((rec.totalSeconds || 0) / 3600).toFixed(2);
+        csv += `${k},${mins},${hrs},${rec.sessions || 1}\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `ChronoLux_Daily_Stats_${getLocalDateKey(new Date())}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showLuxuryToast('تم تصدير ملف الإحصائيات CSV');
+    }
+
+    // =========================================================================
+    // LIVE SYNCHRONIZED INPUT & CHRONOGRAPH ENGINE
+    // =========================================================================
+    function pad2(n) {
+      return String(Math.floor(Math.max(0, n))).padStart(2, '0');
+    }
+
+    function formatPureMinutesAndSeconds(ms) {
+      const totalSeconds = Math.ceil(Math.max(0, ms) / 1000);
+      const totalMinutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      const minStr = totalMinutes < 100 ? pad2(totalMinutes) : String(totalMinutes);
+      return `${minStr}:${pad2(seconds)}`;
+    }
+
+    function formatHoursMinutesSeconds(ms) {
+      const totalSeconds = Math.ceil(Math.max(0, ms) / 1000);
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      return `${pad2(hours)}:${pad2(minutes)}:${pad2(seconds)}`;
+    }
+
+    function formatShortEquivalent(totalMinutes, extraSeconds) {
+      const hrs = Math.floor(totalMinutes / 60);
+      const mins = totalMinutes % 60;
+      if (totalMinutes < 60) {
+        return extraSeconds > 0 ? `${totalMinutes} د و ${extraSeconds} ث` : `${totalMinutes} دقيقة`;
+      }
+      let res = `${hrs} س`;
+      if (mins > 0) res += ` و ${mins} د`;
+      return res;
+    }
+
+    function formatClockTimeClean(timestampMs) {
+      const d = new Date(timestampMs);
+      let h = d.getHours();
+      const m = pad2(d.getMinutes());
+      const period = h >= 12 ? 'PM' : 'AM';
+      h = h % 12 || 12;
+      return `${pad2(h)}:${m} ${period}`;
+    }
+
+    function formatClockTimeWithSeconds(timestampMs) {
+      const d = new Date(timestampMs);
+      let h = d.getHours();
+      const m = pad2(d.getMinutes());
+      const s = pad2(d.getSeconds());
+      const period = h >= 12 ? 'PM' : 'AM';
+      h = h % 12 || 12;
+      return `${pad2(h)}:${m}:${s} ${period}`;
+    }
+
+    // Instant Live Edit: Typing in Minutes/Seconds/Title IMMEDIATELY updates the Circle Dial!
+    function handleLiveTimerInputEdit() {
+      const minInput = document.getElementById('directMinutesInput');
+      const secInput = document.getElementById('directSecondsInput');
+      const titleInput = document.getElementById('timerTitleInput');
+
+      const mins = Math.max(0, parseInt(minInput ? minInput.value : '0', 10) || 0);
+      const secs = Math.min(59, Math.max(0, parseInt(secInput ? secInput.value : '0', 10) || 0));
+
+      const eqEl = document.getElementById('previewEquivalentText');
+      const finishEl = document.getElementById('previewFinishClockText');
+
+      if (eqEl) {
+        eqEl.textContent = formatShortEquivalent(mins, secs);
+      }
+
+      const durationMs = Math.max(1000, (mins * 60 + secs) * 1000);
+      if (finishEl) {
+        finishEl.textContent = formatClockTimeClean(Date.now() + durationMs);
+      }
+
+      const customTitle = (titleInput && titleInput.value.trim()) ? titleInput.value.trim() : `مؤقت ${mins} د`;
+      mainTimer.title = customTitle;
+      mainTimer.totalDurationMs = durationMs;
+      mainTimer.remainingMs = durationMs;
+      mainTimer.preAlertFired = false;
+
+      if (mainTimer.isRunning) {
+        mainTimer.targetEndTime = Date.now() + durationMs;
+      } else {
+        mainTimer.targetEndTime = null;
+      }
+
+      saveStateToStorage();
+      updateMainChronographUI();
+    }
+
+    function syncInputBoxesWithMainTimer() {
+      const totalSecs = Math.round(mainTimer.totalDurationMs / 1000);
+      const mins = Math.floor(totalSecs / 60);
+      const secs = totalSecs % 60;
+      const minInput = document.getElementById('directMinutesInput');
+      const secInput = document.getElementById('directSecondsInput');
+      const titleInput = document.getElementById('timerTitleInput');
+      if (minInput) minInput.value = mins;
+      if (secInput) secInput.value = secs;
+      if (titleInput && mainTimer.title) titleInput.value = mainTimer.title;
+
+      const eqEl = document.getElementById('previewEquivalentText');
+      const finishEl = document.getElementById('previewFinishClockText');
+      if (eqEl) eqEl.textContent = formatShortEquivalent(mins, secs);
+      if (finishEl) finishEl.textContent = formatClockTimeClean(Date.now() + mainTimer.remainingMs);
+    }
+
+    function toggleMainTimerRun() {
+      ensureAudioContext();
+      if (mainTimer.isRunning) {
+        mainTimer.remainingMs = Math.max(0, mainTimer.targetEndTime - Date.now());
+        mainTimer.targetEndTime = null;
+        mainTimer.isRunning = false;
+      } else {
+        if (mainTimer.remainingMs <= 0) {
+          mainTimer.remainingMs = mainTimer.totalDurationMs;
+        }
+        mainTimer.targetEndTime = Date.now() + mainTimer.remainingMs;
+        mainTimer.isRunning = true;
+      }
+      saveStateToStorage();
+      updateMainChronographUI();
+    }
+
+    function resetMainTimer() {
+      mainTimer.isRunning = false;
+      mainTimer.targetEndTime = null;
+      mainTimer.remainingMs = mainTimer.totalDurationMs;
+      mainTimer.preAlertFired = false;
+      saveStateToStorage();
+      updateMainChronographUI();
+    }
+
+    function setDisplayFormat(fmt) {
+      mainTimer.displayFormat = fmt;
+      const btnPure = document.getElementById('modePureMinutesBtn');
+      const btnHms = document.getElementById('modeHrsMinsBtn');
+      const topLabel = document.getElementById('mainReadoutTopLabel');
+
+      if (fmt === 'minutes') {
+        if (btnPure) btnPure.className = 'px-4 py-1.5 rounded-lg lux-btn-primary text-slate-950 font-semibold transition cursor-pointer';
+        if (btnHms) btnHms.className = 'px-4 py-1.5 rounded-lg text-slate-300 hover:text-white font-light transition cursor-pointer';
+        if (topLabel) topLabel.textContent = 'الدقائق المتبقية';
+      } else {
+        if (btnHms) btnHms.className = 'px-4 py-1.5 rounded-lg lux-btn-primary text-slate-950 font-semibold transition cursor-pointer';
+        if (btnPure) btnPure.className = 'px-4 py-1.5 rounded-lg text-slate-300 hover:text-white font-light transition cursor-pointer';
+        if (topLabel) topLabel.textContent = 'الوقت المتبقي';
+      }
+      updateMainChronographUI();
+    }
+
+    function setTimerFromWallClock() {
+      const input = document.getElementById('wallClockTargetInput');
+      if (!input || !input.value) return;
+      const parts = input.value.split(':');
+      if (parts.length < 2) return;
+      const targetHour = parseInt(parts[0], 10);
+      const targetMin = parseInt(parts[1], 10);
+
+      const now = new Date();
+      const target = new Date();
+      target.setHours(targetHour, targetMin, 0, 0);
+      if (target.getTime() <= now.getTime()) {
+        target.setDate(target.getDate() + 1);
+      }
+
+      const diffMs = target.getTime() - now.getTime();
+      const totalMinutes = Math.max(1, Math.round(diffMs / 60000));
+
+      const minInput = document.getElementById('directMinutesInput');
+      const secInput = document.getElementById('directSecondsInput');
+      const titleInput = document.getElementById('timerTitleInput');
+      if (minInput) minInput.value = totalMinutes;
+      if (secInput) secInput.value = 0;
+      if (titleInput) titleInput.value = `منبه ${input.value}`;
+
+      handleLiveTimerInputEdit();
+      if (!mainTimer.isRunning) {
+        toggleMainTimerRun();
+      }
+      showLuxuryToast(`تم الضبط والتشغيل: ${totalMinutes} دقيقة`);
+    }
+
+    function updateMainChronographUI() {
+      const giantEl = document.getElementById('giantCountdownDisplay');
+      const secPill = document.getElementById('secondaryCountdownPill');
+      const circle = document.getElementById('mainProgressCircle');
+      const finishLabel = document.getElementById('dialFinishTimeLabel');
+      const titleBadge = document.getElementById('activeTimerTitleBadge');
+      const stateText = document.getElementById('timerStateText');
+      const runIcon = document.getElementById('mainToggleRunIcon');
+      const runText = document.getElementById('mainToggleRunText');
+
+      const pureMinStr = formatPureMinutesAndSeconds(mainTimer.remainingMs);
+      const hmsStr = formatHoursMinutesSeconds(mainTimer.remainingMs);
+
+      if (mainTimer.displayFormat === 'minutes') {
+        if (giantEl) giantEl.textContent = pureMinStr;
+        if (secPill) secPill.textContent = hmsStr;
+      } else {
+        if (giantEl) giantEl.textContent = hmsStr;
+        if (secPill) secPill.textContent = `${pureMinStr} m`;
+      }
+
+      const total = Math.max(1000, mainTimer.totalDurationMs);
+      const ratio = Math.min(1, Math.max(0, mainTimer.remainingMs / total));
+      const offset = CIRCUMFERENCE * (1 - ratio);
+      if (circle) {
+        circle.style.strokeDashoffset = String(offset);
+      }
+
+      const totalMins = (mainTimer.totalDurationMs / 60000).toFixed(0);
+      const remMins = (mainTimer.remainingMs / 60000).toFixed(1);
+      const elapsedMins = Math.max(0, (mainTimer.totalDurationMs - mainTimer.remainingMs) / 60000).toFixed(1);
+      const progressPct = Math.min(100, Math.max(0, ((mainTimer.totalDurationMs - mainTimer.remainingMs) / total) * 100)).toFixed(1);
+
+      const elTotal = document.getElementById('statTotalMinutes');
+      const elRem = document.getElementById('statRemainingMinutes');
+      const elElapsed = document.getElementById('statElapsedMinutes');
+      const elPct = document.getElementById('statProgressPercent');
+
+      if (elTotal) elTotal.textContent = `${totalMins}m`;
+      if (elRem) elRem.textContent = `${remMins}m`;
+      if (elElapsed) elElapsed.textContent = `${elapsedMins}m`;
+      if (elPct) elPct.textContent = `${progressPct}%`;
+
+      if (titleBadge) titleBadge.textContent = mainTimer.title;
+
+      if (mainTimer.isRunning && mainTimer.targetEndTime) {
+        if (finishLabel) finishLabel.textContent = formatClockTimeClean(mainTimer.targetEndTime);
+        if (stateText) stateText.textContent = 'نشط';
+        if (runIcon) runIcon.innerHTML = SVG_PAUSE;
+        if (runText) runText.textContent = 'إيقاف مؤقت';
+      } else {
+        const previewEnd = Date.now() + mainTimer.remainingMs;
+        if (finishLabel) finishLabel.textContent = formatClockTimeClean(previewEnd);
+        if (stateText) stateText.textContent = mainTimer.remainingMs < mainTimer.totalDurationMs ? 'متوقف' : 'جاهز';
+        if (runIcon) runIcon.innerHTML = SVG_PLAY;
+        if (runText) runText.textContent = mainTimer.remainingMs < mainTimer.totalDurationMs ? 'استئناف' : 'تشغيل';
+      }
+    }
+
+    function addParallelTimerFromInput() {
+      ensureAudioContext();
+      const minInput = document.getElementById('directMinutesInput');
+      const secInput = document.getElementById('directSecondsInput');
+      const titleInput = document.getElementById('timerTitleInput');
+
+      const mins = Math.max(1, parseInt(minInput ? minInput.value : '60', 10) || 60);
+      const secs = Math.min(59, Math.max(0, parseInt(secInput ? secInput.value : '0', 10) || 0));
+      const totalMs = (mins * 60 + secs) * 1000;
+      const title = (titleInput && titleInput.value.trim()) ? titleInput.value.trim() : `مؤقت ${mins} د`;
+
+      parallelTimers.unshift({
+        id: 'pt-' + Date.now(),
+        title,
+        totalMs,
+        remainingMs: totalMs,
+        targetEndTime: Date.now() + totalMs,
+        isRunning: true
+      });
+
+      renderParallelTimers();
+      showLuxuryToast(`أضيف: ${title}`);
+    }
+
+    function toggleParallelTimer(id) {
+      ensureAudioContext();
+      const t = parallelTimers.find((item) => item.id === id);
+      if (!t) return;
+      if (t.isRunning) {
+        t.remainingMs = Math.max(0, t.targetEndTime - Date.now());
+        t.targetEndTime = null;
+        t.isRunning = false;
+      } else {
+        if (t.remainingMs <= 0) t.remainingMs = t.totalMs;
+        t.targetEndTime = Date.now() + t.remainingMs;
+        t.isRunning = true;
+      }
+      renderParallelTimers();
+    }
+
+    function removeParallelTimer(id) {
+      parallelTimers = parallelTimers.filter((item) => item.id !== id);
+      renderParallelTimers();
+    }
+
+    function clearCompletedParallelTimers() {
+      parallelTimers = parallelTimers.filter((item) => item.remainingMs > 0);
+      renderParallelTimers();
+    }
+
+    function renderParallelTimers() {
+      const container = document.getElementById('parallelTimersList');
+      const badge = document.getElementById('parallelCountBadge');
+      if (badge) badge.textContent = String(parallelTimers.length);
+      if (!container) return;
+
+      if (parallelTimers.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-4 text-xs text-slate-400 font-light">
+            لا توجد مؤقتات إضافية
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = parallelTimers.map((t) => {
+        const pct = Math.min(100, Math.max(0, ((t.totalMs - t.remainingMs) / Math.max(1, t.totalMs)) * 100)).toFixed(0);
+        const pureStr = formatPureMinutesAndSeconds(t.remainingMs);
+        const btnLabel = t.isRunning ? 'إيقاف' : 'تشغيل';
+
+        return `
+          <div class="rounded-2xl px-4 py-2.5 border border-white/15 bg-transparent flex items-center justify-between gap-3">
+            <div class="flex-1 min-w-[120px]">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-xs font-normal text-slate-100">${t.title}</span>
+                <span class="mono-digits text-[10px] text-slate-400" dir="ltr">${pct}%</span>
+              </div>
+              <div class="w-full h-1 bg-white/10 rounded-full overflow-hidden">
+                <div class="h-full accent-bg transition-all" style="width: ${pct}%"></div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2.5">
+              <div class="mono-digits text-base font-medium accent-text px-1" dir="ltr">${pureStr}</div>
+              <button type="button" onclick="toggleParallelTimer('${t.id}')" class="lux-chip px-3 py-1 rounded-xl text-[11px] font-normal text-slate-100 cursor-pointer">
+                ${btnLabel}
+              </button>
+              <button type="button" onclick="removeParallelTimer('${t.id}')" class="text-slate-400 hover:text-rose-400 p-1 transition cursor-pointer" title="حذف">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function triggerAlarmModalNow(completedTitle) {
+      const modal = document.getElementById('alarmRingingModal');
+      const titleEl = document.getElementById('modalAlarmTitle');
+      const subEl = document.getElementById('modalAlarmSubtitle');
+      const totalMins = Math.round(mainTimer.totalDurationMs / 60000);
+
+      if (titleEl) titleEl.textContent = completedTitle || mainTimer.title;
+      if (subEl) subEl.textContent = `${totalMins} دقيقة • ${formatClockTimeClean(Date.now())}`;
+      if (modal) modal.classList.remove('hidden');
+
+      alarmTriggeredAt = Date.now();
+      startContinuousAlarmAudio();
+
+      if (overtimeInterval) clearInterval(overtimeInterval);
+      overtimeInterval = setInterval(() => {
+        const el = document.getElementById('modalOvertimeCounter');
+        if (el && alarmTriggeredAt) {
+          const overMs = Date.now() - alarmTriggeredAt;
+          el.textContent = '+' + formatPureMinutesAndSeconds(overMs);
+        }
+      }, 500);
+    }
+
+    function dismissAlarmModal() {
+      stopContinuousAlarmAudio();
+      if (overtimeInterval) {
+        clearInterval(overtimeInterval);
+        overtimeInterval = null;
+      }
+      const modal = document.getElementById('alarmRingingModal');
+      if (modal) modal.classList.add('hidden');
+      resetMainTimer();
+    }
+
+    function snoozeAlarmMinutes(snoozeMins) {
+      stopContinuousAlarmAudio();
+      if (overtimeInterval) {
+        clearInterval(overtimeInterval);
+        overtimeInterval = null;
+      }
+      const modal = document.getElementById('alarmRingingModal');
+      if (modal) modal.classList.add('hidden');
+
+      const snoozeMs = snoozeMins * 60 * 1000;
+      mainTimer.title = `غفوة +${snoozeMins} د`;
+      mainTimer.totalDurationMs = snoozeMs;
+      mainTimer.remainingMs = snoozeMs;
+      mainTimer.targetEndTime = Date.now() + snoozeMs;
+      mainTimer.isRunning = true;
+      mainTimer.preAlertFired = true;
+
+      syncInputBoxesWithMainTimer();
+      saveStateToStorage();
+      updateMainChronographUI();
+      showLuxuryToast(`غفوة ${snoozeMins} دقائق`);
+    }
+
+    function setLuxuryTheme(themeName) {
+      document.documentElement.setAttribute('data-theme', themeName);
+      try {
+        localStorage.setItem('chronolux_theme', themeName);
+      } catch (e) {}
+      if (currentMainView === 'stats') {
+        renderStatsCharts();
+      }
+    }
+
+    let toastTimeout = null;
+    function showLuxuryToast(msg) {
+      const toast = document.getElementById('luxToast');
+      const text = document.getElementById('luxToastText');
+      if (!toast || !text) return;
+      text.textContent = msg;
+      toast.classList.remove('hidden');
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 2600);
+    }
+
+    function saveStateToStorage() {
+      try {
+        localStorage.setItem('chronolux_main_timer', JSON.stringify(mainTimer));
+      } catch (e) {}
+    }
+
+    function restoreStateFromStorage() {
+      try {
+        const savedTheme = localStorage.getItem('chronolux_theme');
+        if (savedTheme) {
+          setLuxuryTheme(savedTheme);
+        } else {
+          setLuxuryTheme('emerald');
+        }
+
+        const savedScene = localStorage.getItem('chronolux_bg_scene');
+        if (savedScene) {
+          bgSceneMode = savedScene;
+          const sel = document.getElementById('bgSceneSelect');
+          if (sel) sel.value = savedScene;
+        }
+
+        const raw = localStorage.getItem('chronolux_main_timer');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed.totalDurationMs === 'number') {
+            mainTimer = Object.assign(mainTimer, parsed);
+            if (mainTimer.isRunning && mainTimer.targetEndTime) {
+              const rem = mainTimer.targetEndTime - Date.now();
+              if (rem > 0) {
+                mainTimer.remainingMs = rem;
+              } else {
+                mainTimer.remainingMs = mainTimer.totalDurationMs;
+                mainTimer.isRunning = false;
+                mainTimer.targetEndTime = null;
+              }
+            }
+          }
+        }
+      } catch (e) {}
+    }
+
+    let lastStatTickEpoch = Date.now();
+
+    function masterHeartbeatTick() {
+      const nowEpoch = Date.now();
+      const dtSec = Math.max(0, (nowEpoch - lastStatTickEpoch) / 1000);
+      lastStatTickEpoch = nowEpoch;
+
+      const clockEl = document.getElementById('liveWallClock');
+      if (clockEl) {
+        clockEl.textContent = formatClockTimeWithSeconds(nowEpoch);
+      }
+
+      let anyTimerRunning = false;
+
+      if (mainTimer.isRunning && mainTimer.targetEndTime) {
+        anyTimerRunning = true;
+        const rem = mainTimer.targetEndTime - nowEpoch;
+
+        const preCheck = document.getElementById('preAlertCheckbox');
+        if (
+          preCheck &&
+          preCheck.checked &&
+          !mainTimer.preAlertFired &&
+          mainTimer.totalDurationMs > 6 * 60 * 1000 &&
+          rem <= 5 * 60 * 1000 &&
+          rem > 4 * 60 * 1000
+        ) {
+          mainTimer.preAlertFired = true;
+          playSynthesizedToneBurst('quartz');
+          showLuxuryToast('تبقى 5 دقائق');
+        }
+
+        if (rem <= 0) {
+          mainTimer.remainingMs = 0;
+          mainTimer.isRunning = false;
+          mainTimer.targetEndTime = null;
+          saveStateToStorage();
+          updateMainChronographUI();
+          recordActiveSecondsToday(dtSec, 1);
+          triggerAlarmModalNow(mainTimer.title);
+        } else {
+          mainTimer.remainingMs = rem;
+          updateMainChronographUI();
+        }
+      }
+
+      let parallelChanged = false;
+      parallelTimers.forEach((pt) => {
+        if (pt.isRunning && pt.targetEndTime) {
+          anyTimerRunning = true;
+          const r = pt.targetEndTime - nowEpoch;
+          if (r <= 0) {
+            pt.remainingMs = 0;
+            pt.isRunning = false;
+            pt.targetEndTime = null;
+            parallelChanged = true;
+            recordActiveSecondsToday(0, 1);
+            triggerAlarmModalNow(pt.title);
+          } else {
+            pt.remainingMs = r;
+            parallelChanged = true;
+          }
+        }
+      });
+      if (parallelChanged) {
+        renderParallelTimers();
+      }
+
+      if (anyTimerRunning && dtSec > 0 && dtSec < 5) {
+        recordActiveSecondsToday(dtSec, 0);
+      }
+    }
+
+    window.addEventListener('resize', resizeBgCanvas);
+
+    window.addEventListener('DOMContentLoaded', () => {
+      resizeBgCanvas();
+      initAnimatedBackgroundObjects();
+      requestAnimationFrame(renderAnimatedBackgroundFrame);
+
+      initDefaultStatsHistoryIfEmpty();
+      const manualDateEl = document.getElementById('manualLogDateInput');
+      if (manualDateEl) manualDateEl.value = getLocalDateKey(new Date());
+
+      restoreStateFromStorage();
+      syncInputBoxesWithMainTimer();
+      updateMainChronographUI();
+      renderParallelTimers();
+      setInterval(masterHeartbeatTick, 250);
+    });
+  </script>
+</body>
+</html>
